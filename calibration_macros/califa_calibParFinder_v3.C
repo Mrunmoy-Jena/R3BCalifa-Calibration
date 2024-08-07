@@ -25,6 +25,7 @@ void califa_calibParFinder_v3() {
   // Create source using ucesb for input ------------------
   //TString filename = "/igfae_lustre/NUCL/s509/rootfiles/s509_0213_000x_map_20230428_171528.root";
   TString inputFile;
+  cout<<"Welcome";
   cout<<"Enter the filename (w/o .root):";
   cin>>inputFile;
   TString in_dir = "/media/mrunmoy/MyDisk/data_calibration/unpacked/";
