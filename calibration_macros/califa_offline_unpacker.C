@@ -39,14 +39,12 @@ void califa_offline_unpacker(int nev = -1)
     // Create input -----------------------------------------
     // TString inputFileName="main0070_all.lmd";
     //TString inputFileName="--stream=lxlanddaq01:9000";
-    TString inputFile;
-    cout<<"Enter the filename (w/o .lmd):";
-    cin>>inputFile;
+    TString inputFile;   //use wildcard
     TString in_dir = "/media/mrunmoy/MyDisk/data_calibration/lmd/"; //the directory of your lmd file
-    TString inputFileName = in_dir+inputFile+".lmd";
+    TString inputFileName = in_dir+"analog_proton_760mV*.lmd";
     // Output file ------------------------------------------
     TString out_dir = "/media/mrunmoy/MyDisk/data_calibration/unpacked/"; //directory where you want to store the unpacked file
-    TString outputFileName = out_dir+inputFile+".root";
+    TString outputFileName = out_dir+"analog_proton_760mVall.root";
 
     bool Cal_level = true;          // set true if there exists a file with the calibration parameters
     bool NOTstoremappeddata = false; // if true, don't store mapped data in the root file
@@ -71,7 +69,7 @@ void califa_offline_unpacker(int nev = -1)
     // UCESB configuration ----------------------------------
     TString ntuple_options = "RAW";
     TString ucesb_dir = getenv("UCESB_DIR");
-    TString ucesb_path = ucesb_dir + "/../upexps/202402_s091_s118/202402_s091_s118 --allow-errors --input-buffer=200Mi --max-events=1000000";
+    TString ucesb_path = ucesb_dir + "/../upexps/202402_s091_s118/202402_s091_s118 --allow-errors --input-buffer=200Mi";
     //TString ucesb_path = ucesb_dir + "/../upexps/202205_s522/202205_s522 --allow-errors --input-buffer=200Mi";
     //TString ucesb_path = ucesb_dir + "/../upexps/202205_s509/202205_s509 --allow-errors --input-buffer=180Mi";
     ucesb_path.ReplaceAll("//", "/");
