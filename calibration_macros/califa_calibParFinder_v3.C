@@ -28,10 +28,10 @@ void califa_calibParFinder_v3() {
   cout<<"Welcome";
   cout<<"Enter the filename (w/o .root):";
   cin>>inputFile;
-  TString in_dir = "/media/mrunmoy/MyDisk/data_calibration/unpacked/";
+  TString in_dir = "/home/e12exp/ssd/data_calibration/unpacked/";
   TString currentDir = gSystem->Getenv("PWD"); //directory in which macros are stored 
   TString filename = in_dir+inputFile+".root";    //unpacked .root file
-  TString out_dir = "/media/mrunmoy/MyDisk/data_calibration/calibrated/";
+  TString out_dir = "/home/e12exp/ssd/data_calibration/calibrated/";
   TString outputFileName = out_dir+inputFile+"_calibrated.root"; //Output calibrated file
 
   // Parameters for CALIFA

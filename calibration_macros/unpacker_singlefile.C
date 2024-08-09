@@ -39,12 +39,12 @@ void califa_offline_unpacker(int nev = -1)
     // Create input -----------------------------------------
     // TString inputFileName="main0070_all.lmd";
     //TString inputFileName="--stream=lxlanddaq01:9000";
-    TString inputFile;   //use wildcard
-    TString in_dir = "/media/mrunmoy/MyDisk/data_calibration/lmd/"; //the directory of your lmd file
-    TString inputFileName = in_dir+"analog_proton_760mV*.lmd";
+    TString inputFile; 
+    TString in_dir = "/home/e12exp/ssd/data_calibration/lmd/"; //the directory of your lmd file
+    TString inputFileName = in_dir+"analog_proton_760mV_07_07_001_001.lmd";  //single input file
     // Output file ------------------------------------------
-    TString out_dir = "/media/mrunmoy/MyDisk/data_calibration/unpacked/"; //directory where you want to store the unpacked file
-    TString outputFileName = out_dir+"analog_proton_760mVall.root";
+    TString out_dir = "/home/e12exp/ssd/data_calibration/unpacked/"; //directory where you want to store the unpacked file
+    TString outputFileName = out_dir+"analog_proton_760mV_07_07_001_001.root";
 
     bool Cal_level = true;          // set true if there exists a file with the calibration parameters
     bool NOTstoremappeddata = false; // if true, don't store mapped data in the root file
