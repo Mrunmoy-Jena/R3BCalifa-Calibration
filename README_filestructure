@@ -1,0 +1,10 @@
+README:
+What each file does for the calibration:
+
+* unpacked_singlefile.C : to unpack and store individual .lmd file as a .root file (done)
+* sanity_check.C : macro to get energy spectra of each crystal and check if data is good or not (to be done)
+* unpacked_chained.C: If files appear to be all right (no absurd data), can be combined with the  into one .root file 
+* califa_calibParFinder_v3.C: Calibration macro, source name is to be specified here as 22Na
+* R3BCalifaMapped2CrystalCalPar.cxx: Currently uses SearchPeaks() function when fSourceName is "22Na", this function then makes linear fit to the peaks and writes them to a ...calibrated.root file and calibratedpars.par file (Most of the changes are to be made inside this function)
+
+MAKE SURE that filenames and paths are correctly set inside the macros !!

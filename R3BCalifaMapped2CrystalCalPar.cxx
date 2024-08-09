@@ -168,9 +168,9 @@ InitStatus R3BCalifaMapped2CrystalCalPar::Init()
     }
 
     // Initiate output file
-    outrootfile = TFile::Open("/media/mrunmoy/MyDisk/data_calibration/calibrated/spectrum.root","UPDATE");
+    outrootfile = TFile::Open("/home/e12exp/ssd/data_calibration/calibrated/spectrum.root","UPDATE");
     if (!outrootfile) {
-    	outrootfile = new TFile("/media/mrunmoy/MyDisk/data_calibration/calibrated/spectrum.root","RECREATE");
+    	outrootfile = new TFile("/home/e12exp/ssd/data_calibration/calibrated/spectrum.root","RECREATE");
 	outrootfile->cd();
 	outroottree = new TTree("genT","General Tree");
     }
@@ -334,7 +334,7 @@ void R3BCalifaMapped2CrystalCalPar::FinishTask()
 
 // find and record
 // mapping level peaks
-void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
+void R3BCalifaMapped2CrystalCalPar::SearchPeaks()   //I am using only the SearchPeaks() method for calibration, with fSourceName = 22Na
 {
     cout<<"SearchPeaks() called";
     Int_t numPars = 2; // Number of parameters=2 by default
