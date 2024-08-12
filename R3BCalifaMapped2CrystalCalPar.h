@@ -57,7 +57,11 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     /** Virtual method ReInit **/
     virtual InitStatus ReInit();
 
-    /** Virtual method Search peaks and calibrate **/
+
+    /** Virtual method Pulser Calibration **/
+    virtual void PulserCalibration();
+
+    /** Virtual method Search peaks **/
     virtual void SearchPeaks();
 
     /** Virtual method Fit peaks **/
@@ -77,6 +81,10 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     const Int_t GetNumParameterFit() { return fNumParam; }
     const Int_t GetMinStadistics() { return fMinStadistics; }
     const TString GetSourceName() { return fSourceName; }
+    
+    const Double_t GetMaxSigma() { return fMaxSigma; }
+    const Int_t GetMinPeakEvents() { return fMinPeakEvents; }
+    const Int_t GetPulserNumber() { return fPulserNumber; }
 
     TArrayF* GetEnergyPeaks() { return fEnergyPeaks; }
 
@@ -105,6 +113,11 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     void SetNumParameterFit(Int_t numberParFit) { fNumParam = numberParFit; }
     void SetMinStadistics(Int_t minstad) { fMinStadistics = minstad; }
     void SetSourceName(TString sourceName) { fSourceName = sourceName; }
+    
+    void SetMaxSigma(Double_t MaxSigma) { fMaxSigma = MaxSigma; }
+    void SetMinPeakEvents(Int_t MinPeakEvents) { fMinPeakEvents = MinPeakEvents; }
+    void SetPulserNumber(Int_t PulserNumber) { fPulserNumber = PulserNumber; }
+    
 
     void SetDebugMode(Bool_t debug) { fDebugMode = debug; }
 
@@ -138,7 +151,7 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     Double_t fSigLowThreshold;
     Double_t fSigHighThreshold;
     Double_t fMinWidth;
-
+    
     Double_t fMinSlope;
     Double_t fMinSlopeP;
     Double_t fMaxSlope;
@@ -147,6 +160,10 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     Double_t fGausRange;
     Double_t fGausRangeP;
     Double_t fGausBaseEnergy;
+
+    Double_t fMaxSigma;
+    Int_t fMinPeakEvents;
+    Int_t fPulserNumber;
 
     TString fSourceName;
 

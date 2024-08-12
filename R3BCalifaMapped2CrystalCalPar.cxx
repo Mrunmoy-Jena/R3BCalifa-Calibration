@@ -82,6 +82,9 @@ R3BCalifaMapped2CrystalCalPar::R3BCalifaMapped2CrystalCalPar(const char* name, I
     , fEnergyPeaks(NULL)
     , fDebugMode(0)
     , fSourceName("fitting")
+    , fMaxSigma(50.0)
+    , fMinPeakEvents(100)
+    , fPulserNumber(3)
 {
 }
 
@@ -168,9 +171,9 @@ InitStatus R3BCalifaMapped2CrystalCalPar::Init()
     }
 
     // Initiate output file
-    outrootfile = TFile::Open("/media/mrunmoy/MyDisk/data_calibration/calibrated/spectrum.root","UPDATE");
+    outrootfile = TFile::Open("/home/e12exp/spectrum.root","UPDATE");
     if (!outrootfile) {
-    	outrootfile = new TFile("/media/mrunmoy/MyDisk/data_calibration/calibrated/spectrum.root","RECREATE");
+    	outrootfile = new TFile("/home/e12exp/spectrum.root","RECREATE");
 	outrootfile->cd();
 	outroottree = new TTree("genT","General Tree");
     }
@@ -186,7 +189,7 @@ InitStatus R3BCalifaMapped2CrystalCalPar::Init()
     char name5[100];
     char name6[100];
     Int_t fright, fleft, fbins;
-    if (fSourceName=="60Co" || fSourceName=="22Na" || fSourceName=="AmBe" || fSourceName=="152Eu")
+    if (fSourceName=="60Co" || fSourceName=="22Na" || fSourceName=="AmBe" || fSourceName=="152Eu" || fSourceName == "22Na_pulser" || fSourceName == "60Co_pulser" || fSourceName == "AmBe_pulser"  || fSourceName == "152Eu_pulser")
     {
         fh_Map_energy_crystal = new TH1F*[fNumCrystals];
     } else if (fSourceName == "fitting")
@@ -218,7 +221,7 @@ InitStatus R3BCalifaMapped2CrystalCalPar::Init()
                 fleft = fMapHistos_leftp;
                 fbins = fMapHistos_binsp;
             }
-	    if (fSourceName=="60Co" || fSourceName=="22Na" || fSourceName=="AmBe" || fSourceName == "152Eu")
+	    if (fSourceName=="60Co" || fSourceName=="22Na" || fSourceName=="AmBe" || fSourceName == "152Eu" || fSourceName == "22Na_pulser" || fSourceName == "60Co_pulser" || fSourceName == "AmBe_pulser"  || fSourceName == "152Eu_pulser")
 	    {
                 fh_Map_energy_crystal[i] = new TH1F(name1, name1, fbins, fleft, fright);
 	    } else if (fSourceName=="fitting")
@@ -231,7 +234,7 @@ InitStatus R3BCalifaMapped2CrystalCalPar::Init()
 	    }
         }
 
-    if (fSourceName=="60Co" || fSourceName=="22Na" || fSourceName=="AmBe" || fSourceName == "152Eu")
+    if (fSourceName=="60Co" || fSourceName=="22Na" || fSourceName=="AmBe" || fSourceName == "152Eu" || fSourceName == "22Na_pulser" || fSourceName == "60Co_pulser" || fSourceName == "AmBe_pulser"  || fSourceName == "152Eu_pulser")
     {
         fh2_Map_crystal_gamma = new TH2F("fh2_Map_crystal_gamma","fh2_Map_crystal_gamma;crystal ID;Map Energy",fNumCrystals/2,0,fNumCrystals/2,fMapHistos_bins,fMapHistos_left,fMapHistos_right);
         fh2_Map_crystal_proton = new TH2F("fh2_Map_crystal_proton","fh2_Map_crystal_proton;crystal ID;Map Energy",fNumCrystals/2,fNumCrystals/2,fNumCrystals,fMapHistos_binsp,fMapHistos_leftp,fMapHistos_rightp);
@@ -263,7 +266,6 @@ InitStatus R3BCalifaMapped2CrystalCalPar::ReInit()
 
 void R3BCalifaMapped2CrystalCalPar::Exec(Option_t* opt)
 {
-    cout<<"Exec() called";
     if (fSourceName == "fitting") return;
 
     Int_t nHits = fCalifaMappedDataCA->GetEntries();
@@ -309,16 +311,22 @@ void R3BCalifaMapped2CrystalCalPar::Exec(Option_t* opt)
     return;
 }
 
-void R3BCalifaMapped2CrystalCalPar::Reset() {cout<<"Reset() called";}
+void R3BCalifaMapped2CrystalCalPar::Reset() {}
 
-void R3BCalifaMapped2CrystalCalPar::FinishEvent() {cout<<"FinishTask() called";}
+void R3BCalifaMapped2CrystalCalPar::FinishEvent() {}
 
 void R3BCalifaMapped2CrystalCalPar::FinishTask()
 {
-    cout<<"finishTask() called";
+    cout << "finishTask() called" << endl;
+    
     if (fSourceName == "22Na" || fSourceName == "60Co" || fSourceName == "AmBe"  || fSourceName == "152Eu" )
     {
 	SearchPeaks();
+    }
+    
+    if (fSourceName == "22Na_pulser" || fSourceName == "60Co_pulser" || fSourceName == "AmBe_pulser"  || fSourceName == "152Eu_pulser" )
+    {
+	PulserCalibration();
 	fCal_Par->printParams();
     }
     
@@ -332,28 +340,16 @@ void R3BCalifaMapped2CrystalCalPar::FinishTask()
     outrootfile->Close();
 }
 
-// find and record
-// mapping level peaks
-void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
+
+
+//_____________Search_Peaks____________________//
+
+void R3BCalifaMapped2CrystalCalPar::SearchPeaks() 
 {
-    cout<<"SearchPeaks() called";
-    Int_t numPars = 2; // Number of parameters=2 by default
-    Int_t nfound = 0;
-    if (fNumParam)  // if num of parameters is explicitly specified then get this value
-    {
-        numPars = fNumParam;
-    }
-    
-    fCal_Par->SetNumCrystals(fNumCrystals);  //set the cal parameters
-    fCal_Par->SetNumParametersFit(fNumParam);
-    fCal_Par->GetCryCalParams()->Set(numPars * fNumCrystals); //total num of parameters I guess
-    Int_t fright, fleft;
-    TSpectrum* ss = new TSpectrum(fNumPeaks);
-    
     for (Int_t i=0; i<fNumCrystals; i++)
     {
-	//Int_t nfound = 0;
-	//TSpectrum* ss = new TSpectrum(fNumPeaks);
+	Int_t nfound = 0;
+	TSpectrum* ss = new TSpectrum(fNumPeaks);
 
 	if ((fMap_Par->GetInUse(i+1) == 1) && (fh_Map_energy_crystal[i]->GetEntries() > fMinStadistics))
 	{
@@ -363,32 +359,27 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
             fChannelPeaks = (Double_t*) ss->GetPositionX();
 	    Int_t idx[nfound];
             TMath::Sort(nfound, fChannelPeaks, idx, kTRUE);
-            
-            // Calibrated Spectrum
-            Double_t X[nfound + 1];
-            Double_t Y[nfound + 1];
-                
+
 	    for (Int_t j=0; j<nfound; j++)
 	    {
 		// gaussian fit
-		//Double_t posX = fChannelPeaks[idx[nfound-j-1]];
-                //TF1 * gaussfit;
-                X[j] = fChannelPeaks[idx[nfound - j - 1]];
-                Y[j] = fEnergyPeaks->GetAt(nfound - j - 1);
-                
-                 /* if (i<fNumCrystals/2)
-		gaussfit = new TF1("gaussfit","gaus",posX-fSigma*15,posX+fSigma*15);
-                else
-                gaussfit = new TF1("gaussfit","gaus",posX-fSigma*1.5,posX+fSigma*1.5);
-
+		Double_t posX = fChannelPeaks[idx[nfound-j-1]];
+    		TF1 * gaussfit;
+    
+    		if (i<fNumCrystals/2)
+			gaussfit = new TF1("gaussfit","gaus",posX-fSigma*15,posX+fSigma*15);
+    		else
+        		gaussfit = new TF1("gaussfit","gaus",posX-fSigma*1.5,posX+fSigma*1.5);
+		
 		TH1F* h_copy = (TH1F*) fh_Map_energy_crystal[i]->Clone("h_copy");
 		fh_Map_energy_crystal[i]->Fit("gaussfit","RQ");
 		Double_t mean = gaussfit->GetParameter(1);
 		Double_t sigma = gaussfit->GetParameter(2);
-
+	
 		Double_t pmX[1] = {(Double_t) i};
 		Double_t pmY[1] = {mean};
 		Double_t pmZ[1] = {sigma};
+		
 		TPolyMarker *pm1 = new TPolyMarker(1,pmX,pmY);
 		pm1->SetMarkerStyle(23);
 		pm1->SetMarkerColor(kRed);
@@ -397,84 +388,184 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
 		pm2->SetMarkerColor(kBlack);
 
 		if (i<fNumCrystals/2)
-		{
+		{	
 			fh_peak_crystal_gamma->Fill(i,mean);
+			//fh_peak_crystal_gamma->GetListOfFunctions()->Add(pm1);
+			//fh_peak_crystal_gamma->GetListOfFunctions()->Print();
 			fh_sigma_crystal_gamma->Fill(i,sigma);
 			fh2_Map_crystal_gamma->GetListOfFunctions()->Add(pm1);
 			fh2_Map_crystal_gamma->GetListOfFunctions()->Print();
-			fh_peak_crystal_gamma->GetListOfFunctions()->Add(pm1);
-			fh_peak_crystal_gamma->GetListOfFunctions()->Print();
 			fh_sigma_crystal_gamma->GetListOfFunctions()->Add(pm2);
 			fh_sigma_crystal_gamma->GetListOfFunctions()->Print();
 		}
-                else
+    		else
 		{
 			fh_peak_crystal_proton->Fill(i,mean);
+			//fh_peak_crystal_proton->GetListOfFunctions()->Add(pm1);
+			//fh_peak_crystal_proton->GetListOfFunctions()->Print();
 			fh_sigma_crystal_proton->Fill(i,sigma);
 			fh2_Map_crystal_proton->GetListOfFunctions()->Add(pm1);
 			fh2_Map_crystal_proton->GetListOfFunctions()->Print();
-			fh_peak_crystal_proton->GetListOfFunctions()->Add(pm1);
-			fh_peak_crystal_proton->GetListOfFunctions()->Print();
 			fh_sigma_crystal_proton->GetListOfFunctions()->Add(pm2);
 			fh_sigma_crystal_proton->GetListOfFunctions()->Print();
-		} */
+		}
 	    }
-	    X[nfound]=0.;
-	    Y[nfound]=0.;
-	    
-	    if (i < fMap_Par->GetNumCrystals() / 2)
-                {
-                    fright = fMapHistos_right;
-                    fleft = fMapHistos_left;
-                }
-                else
-                {
-                    fright = fMapHistos_rightp;
-                    fleft = fMapHistos_leftp;
-                }
-                
-                TF1* f1fit = nullptr;
-                if(fNumParam)
-                {
-                    if (fNumParam == 1)
-                    {
-                        f1fit = new TF1("f1fit", "[0]*x", fleft, fright);
-                    }
-                    if (fNumParam == 2)
-                    {
-                        f1fit = new TF1("f1fit", "[0]+[1]*x", fleft, fright);
-                    }
-                }
-                else
-                {
-                    LOG(warn)
-                        << "R3BCalifaMapped2CrystalCalPar:: No input number of fit parameters, therefore, by default "
-                           "NumberParameters=2";
-                    f1fit = new TF1("f1fit", "[0]+[1]*x", fleft, fright);
-                }
-                
-                TGraph* graph = new TGraph(fNumPeaks + 1, X, Y);
-                graph->Fit("f1fit", "Q"); // Quiet mode (minimum printing)
+	}
 
-                for (Int_t h = 0; h < numPars; h++)
-                {
-                    fCal_Par->SetCryCalParams(f1fit->GetParameter(h), numPars*i+h); //1-base
-                }
+  	if (ss)
+		delete ss;
+    }
+
+    fh2_Map_crystal_gamma->Write("colz");
+    fh2_Map_crystal_proton->Write("colz");
+    fh_peak_crystal_gamma->Write();
+    fh_peak_crystal_proton->Write();
+    fh_sigma_crystal_gamma->Write();
+    fh_sigma_crystal_proton->Write();
+}
+
+
+
+
+//________________Pulser_Calibration____________________//
+
+void R3BCalifaMapped2CrystalCalPar::PulserCalibration()  
+{
+    cout << "Pulser_Calibration() called" <<endl;
+  
+    Int_t numPars = 2; // Number of parameters=2 by default
+    Int_t nfound = 0;
+    if (fNumParam)  // if num of parameters is explicitly specified then get this value
+    {
+        numPars = fNumParam;
+    }
+    
+    fCal_Par->SetNumCrystals(fNumCrystals);
+    fCal_Par->SetNumParametersFit(fNumParam);
+    fCal_Par->GetCryCalParams()->Set(numPars * fNumCrystals);
+    Int_t fright, fleft;
+    TSpectrum* ss = new TSpectrum(fNumPeaks + fPulserNumber);	//fNumPeaks corresponds to the number of energy values ​​specified in the macro, fPulserNumber corresponds to the number of different pulser signals
+    
+    for (Int_t i=0; i<fNumCrystals; i++)
+    {
+
+	if ((fMap_Par->GetInUse(i+1) == 1) && (fh_Map_energy_crystal[i]->GetEntries() > fMinStadistics))
+	{
+	    nfound = ss->Search(fh_Map_energy_crystal[i], fSigma, "", fThreshold);	// "goff" to turn off drawing
+            fh_Map_energy_crystal[i]->Write();
+
+            fChannelPeaks = (Double_t*) ss->GetPositionX();
+	    Int_t idx[nfound];
+            TMath::Sort(nfound, fChannelPeaks, idx, kFALSE);	//kFALSE: sort in ascending order (from lowest to highest) -> sorted indexes: idx (kTRUE: in decscending)
+
+            // Calibrated Spectrum
+            Double_t X[nfound + 1];	//array with size nfound+1 elements
+            Double_t Y[nfound + 1];
+
+            cout << "Crystal " << i + 1 << endl;  
                 
+            if ((nfound - fPulserNumber) == fNumPeaks)	//Check that the number of source peaks found matches the expected number
+	    {    
+	    	    //gauss fit each found peak and check sigma and events
+		    for (Int_t j=0; j<nfound; j++)
+		    {
+			Double_t posX = fChannelPeaks[idx[j]];
+		        X[j] = posX;
+		        
+		        if (j<fNumPeaks)
+		        	Y[j] = fEnergyPeaks->GetAt(j);	//fills the Y array with reference energy values from fEnergyPeaks
+		        
+			cout << "Peak " << j + 1 << ", uncalibrated found energy: " << X[j] << endl;
+			
+			// Error checks
+		        TF1 * gaussfit;
+		        
+		        if (i<fNumCrystals/2)
+				gaussfit = new TF1("gaussfit","gaus",posX-fSigma*15,posX+fSigma*15);
+		        else
+		        	gaussfit = new TF1("gaussfit","gaus",posX-fSigma*1.5,posX+fSigma*1.5);
+
+			TH1F* h_copy = (TH1F*) fh_Map_energy_crystal[i]->Clone("h_copy");
+			fh_Map_energy_crystal[i]->Fit("gaussfit","RQ");
+			
+			Double_t peakHeight = gaussfit->GetParameter(0);
+			Double_t mean = gaussfit->GetParameter(1);
+			Double_t sigma = gaussfit->GetParameter(2);
+			
+		        Double_t peakArea = peakHeight * sigma * sqrt(2 * M_PI);
+
+			if (sigma > fMaxSigma) // Check if the standard deviation is too large
+		            LOG(error)  << "Peak " << j + 1 << ": Sigma too large (" << sigma << ")!";
+		        
+		        if (peakArea < fMinPeakEvents) // Check if the number of events at the peak is too small
+		            LOG(error)  << "Peak " << j + 1 << ": Too few events at peak (" << peakArea << ")!";
+		    }
+		    
+		    
+		    X[nfound]=0.;	//set last value in array equal to 0 (sentinel value)
+		    Y[nfound]=0.;
+		    
+		    if (i < fMap_Par->GetNumCrystals() / 2)
+		        {
+		            fright = fMapHistos_right;
+		            fleft = fMapHistos_left;
+		        }
+		        else
+		        {
+		            fright = fMapHistos_rightp;
+		            fleft = fMapHistos_leftp;
+		        }
+		        
+		        TF1* f1fit = nullptr;
+		        if(fNumParam)
+		        {
+		            if (fNumParam == 1)
+		            {
+		                f1fit = new TF1("f1fit", "[0]*x", fleft, fright);
+		            }
+		            if (fNumParam == 2)
+		            {
+		                f1fit = new TF1("f1fit", "[0]+[1]*x", fleft, fright);
+		            }
+		        }
+		        else
+		        {
+		            LOG(warn)
+		                << "R3BCalifaMapped2CrystalCalPar:: No input number of fit parameters, therefore, by default "
+		                   "NumberParameters=2";
+		            f1fit = new TF1("f1fit", "[0]+[1]*x", fleft, fright);
+		        }
+		        
+		        TGraph* graph = new TGraph(fNumPeaks, X, Y);
+		        graph->Fit("f1fit", "Q"); // Quiet mode (minimum printing)
+		        
+			cout << "Fit X, Y Werte: " << X[0] << ", " << X[1] << ", " << Y[0] << ", " << Y[1] << endl;
+
+			//pass slope and offset
+		        for (Int_t h = 0; h < numPars; h++)
+		        {
+		            fCal_Par->SetCryCalParams(f1fit->GetParameter(h), numPars*i+h); //1-base
+		        }
+	    }
+	    else
+	    {
+	    	cout << "Number of peaks found does not correspond to the expected number!!!!" << endl;
+	    }     
 	}
     }
     
     delete ss;
     fCal_Par->setChanged();
-    //fh2_Map_crystal_gamma->Write("colz");
-    //fh2_Map_crystal_proton->Write("colz");
-    //fh_peak_crystal_gamma->Write();
-    //fh_peak_crystal_proton->Write();
-    //fh_sigma_crystal_gamma->Write();
-    //fh_sigma_crystal_gamma->Write();
-    //fh_sigma_crystal_proton->Write();
+    
     return;
 }
+
+
+
+
+
+
+//_____________Fit_Peaks____________________//
 
 void R3BCalifaMapped2CrystalCalPar::FitPeaks()
 {
@@ -955,6 +1046,9 @@ void R3BCalifaMapped2CrystalCalPar::FitPeaks()
     fCal_Par->setChanged();
     return;
 }
+
+
+
 
 Double_t R3BCalifaMapped2CrystalCalPar::FindChisquare(Double_t* X, Double_t* Y, Double_t* eX, Int_t ndf, TF1* f)
 {
