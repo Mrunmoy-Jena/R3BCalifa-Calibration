@@ -1,0 +1,125 @@
+
+Thread 12 (Thread 0x7fc7127fc700 (LWP 1352541) "civetweb-master"):
+#0  0x00007fc7401c9bbf in poll () from /lib/x86_64-linux-gnu/libc.so.6
+#1  0x00007fc72c6fa024 in poll (__timeout=2000, __nfds=<optimized out>, __fds=0x557f50e95a80) at /usr/include/x86_64-linux-gnu/bits/poll2.h:46
+#2  mg_poll (pfd=pfd
+entry=0x557f50e95a80, n=1, milliseconds=milliseconds
+entry=2000, stop_flag=stop_flag
+entry=0x557f53460d68) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:5938
+#3  0x00007fc72c6fdc40 in master_thread_run (ctx=0x557f53460d40) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:19279
+#4  master_thread (thread_func_param=0x557f53460d40) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:19390
+#5  0x00007fc740094609 in start_thread () from /lib/x86_64-linux-gnu/libpthread.so.0
+#6  0x00007fc7401d6353 in clone () from /lib/x86_64-linux-gnu/libc.so.6
+
+Thread 11 (Thread 0x7fc712ffd700 (LWP 1352540) "civetweb-worker"):
+#0  0x00007fc74009b376 in pthread_cond_wait
+
+GLIBC_2.3.2 () from /lib/x86_64-linux-gnu/libpthread.so.0
+#1  0x00007fc72c70d18b in consume_socket (thread_index=<optimized out>, sp=<optimized out>, ctx=0x557f53460d40) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:18783
+#2  worker_thread_run (conn=0x557f53f9bde0) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:18924
+#3  worker_thread (thread_func_param=0x557f53f9bde0) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:19097
+#4  0x00007fc740094609 in start_thread () from /lib/x86_64-linux-gnu/libpthread.so.0
+#5  0x00007fc7401d6353 in clone () from /lib/x86_64-linux-gnu/libc.so.6
+
+Thread 10 (Thread 0x7fc7137fe700 (LWP 1352539) "civetweb-worker"):
+#0  0x00007fc74009b376 in pthread_cond_wait
+
+GLIBC_2.3.2 () from /lib/x86_64-linux-gnu/libpthread.so.0
+#1  0x00007fc72c70d18b in consume_socket (thread_index=<optimized out>, sp=<optimized out>, ctx=0x557f53460d40) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:18783
+#2  worker_thread_run (conn=0x557f53f9b350) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:18924
+#3  worker_thread (thread_func_param=0x557f53f9b350) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:19097
+#4  0x00007fc740094609 in start_thread () from /lib/x86_64-linux-gnu/libpthread.so.0
+#5  0x00007fc7401d6353 in clone () from /lib/x86_64-linux-gnu/libc.so.6
+
+Thread 9 (Thread 0x7fc713fff700 (LWP 1352538) "civetweb-worker"):
+#0  0x00007fc74009b376 in pthread_cond_wait
+
+GLIBC_2.3.2 () from /lib/x86_64-linux-gnu/libpthread.so.0
+#1  0x00007fc72c70d18b in consume_socket (thread_index=<optimized out>, sp=<optimized out>, ctx=0x557f53460d40) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:18783
+#2  worker_thread_run (conn=0x557f53f9a8c0) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:18924
+#3  worker_thread (thread_func_param=0x557f53f9a8c0) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:19097
+#4  0x00007fc740094609 in start_thread () from /lib/x86_64-linux-gnu/libpthread.so.0
+#5  0x00007fc7401d6353 in clone () from /lib/x86_64-linux-gnu/libc.so.6
+
+Thread 8 (Thread 0x7fc72485b700 (LWP 1352537) "civetweb-worker"):
+#0  0x00007fc74009b376 in pthread_cond_wait
+
+GLIBC_2.3.2 () from /lib/x86_64-linux-gnu/libpthread.so.0
+#1  0x00007fc72c70d18b in consume_socket (thread_index=<optimized out>, sp=<optimized out>, ctx=0x557f53460d40) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:18783
+#2  worker_thread_run (conn=0x557f53f99e30) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:18924
+#3  worker_thread (thread_func_param=0x557f53f99e30) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:19097
+#4  0x00007fc740094609 in start_thread () from /lib/x86_64-linux-gnu/libpthread.so.0
+#5  0x00007fc7401d6353 in clone () from /lib/x86_64-linux-gnu/libc.so.6
+
+Thread 7 (Thread 0x7fc72505c700 (LWP 1352536) "civetweb-worker"):
+#0  0x00007fc74009b376 in pthread_cond_wait
+
+GLIBC_2.3.2 () from /lib/x86_64-linux-gnu/libpthread.so.0
+#1  0x00007fc72c70d18b in consume_socket (thread_index=<optimized out>, sp=<optimized out>, ctx=0x557f53460d40) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:18783
+#2  worker_thread_run (conn=0x557f53f993a0) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:18924
+#3  worker_thread (thread_func_param=0x557f53f993a0) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:19097
+#4  0x00007fc740094609 in start_thread () from /lib/x86_64-linux-gnu/libpthread.so.0
+#5  0x00007fc7401d6353 in clone () from /lib/x86_64-linux-gnu/libc.so.6
+
+Thread 6 (Thread 0x7fc72585d700 (LWP 1352535) "civetweb-worker"):
+#0  0x00007fc74009b376 in pthread_cond_wait
+
+GLIBC_2.3.2 () from /lib/x86_64-linux-gnu/libpthread.so.0
+#1  0x00007fc72c70d18b in consume_socket (thread_index=<optimized out>, sp=<optimized out>, ctx=0x557f53460d40) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:18783
+#2  worker_thread_run (conn=0x557f53f98910) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:18924
+#3  worker_thread (thread_func_param=0x557f53f98910) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:19097
+#4  0x00007fc740094609 in start_thread () from /lib/x86_64-linux-gnu/libpthread.so.0
+#5  0x00007fc7401d6353 in clone () from /lib/x86_64-linux-gnu/libc.so.6
+
+Thread 5 (Thread 0x7fc72605e700 (LWP 1352534) "civetweb-worker"):
+#0  0x00007fc74009b376 in pthread_cond_wait
+
+GLIBC_2.3.2 () from /lib/x86_64-linux-gnu/libpthread.so.0
+#1  0x00007fc72c70d18b in consume_socket (thread_index=<optimized out>, sp=<optimized out>, ctx=0x557f53460d40) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:18783
+#2  worker_thread_run (conn=0x557f53f97e80) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:18924
+#3  worker_thread (thread_func_param=0x557f53f97e80) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:19097
+#4  0x00007fc740094609 in start_thread () from /lib/x86_64-linux-gnu/libpthread.so.0
+#5  0x00007fc7401d6353 in clone () from /lib/x86_64-linux-gnu/libc.so.6
+
+Thread 4 (Thread 0x7fc729e11700 (LWP 1352533) "civetweb-worker"):
+#0  0x00007fc74009b376 in pthread_cond_wait
+
+GLIBC_2.3.2 () from /lib/x86_64-linux-gnu/libpthread.so.0
+#1  0x00007fc72c70d18b in consume_socket (thread_index=<optimized out>, sp=<optimized out>, ctx=0x557f53460d40) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:18783
+#2  worker_thread_run (conn=0x557f53f973f0) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:18924
+#3  worker_thread (thread_func_param=0x557f53f973f0) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:19097
+#4  0x00007fc740094609 in start_thread () from /lib/x86_64-linux-gnu/libpthread.so.0
+#5  0x00007fc7401d6353 in clone () from /lib/x86_64-linux-gnu/libc.so.6
+
+Thread 3 (Thread 0x7fc72a612700 (LWP 1352532) "civetweb-worker"):
+#0  0x00007fc74009b376 in pthread_cond_wait
+
+GLIBC_2.3.2 () from /lib/x86_64-linux-gnu/libpthread.so.0
+#1  0x00007fc72c70d18b in consume_socket (thread_index=<optimized out>, sp=<optimized out>, ctx=0x557f53460d40) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:18783
+#2  worker_thread_run (conn=0x557f53f96960) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:18924
+#3  worker_thread (thread_func_param=0x557f53f96960) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:19097
+#4  0x00007fc740094609 in start_thread () from /lib/x86_64-linux-gnu/libpthread.so.0
+#5  0x00007fc7401d6353 in clone () from /lib/x86_64-linux-gnu/libc.so.6
+
+Thread 2 (Thread 0x7fc72ae13700 (LWP 1352531) "civetweb-worker"):
+#0  0x00007fc74009b376 in pthread_cond_wait
+
+GLIBC_2.3.2 () from /lib/x86_64-linux-gnu/libpthread.so.0
+#1  0x00007fc72c70d18b in consume_socket (thread_index=<optimized out>, sp=<optimized out>, ctx=0x557f53460d40) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:18783
+#2  worker_thread_run (conn=0x557f53f95ed0) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:18924
+#3  worker_thread (thread_func_param=0x557f53f95ed0) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/net/http/civetweb/civetweb.c:19097
+#4  0x00007fc740094609 in start_thread () from /lib/x86_64-linux-gnu/libpthread.so.0
+#5  0x00007fc7401d6353 in clone () from /lib/x86_64-linux-gnu/libc.so.6
+
+Thread 1 (Thread 0x7fc73fdd5a80 (LWP 1352514) "root.exe"):
+#0  0x00007fc740199c7f in wait4 () from /lib/x86_64-linux-gnu/libc.so.6
+#1  0x00007fc740108f67 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#2  0x00007fc740862cd4 in TUnixSystem::Exec (shellcmd=<optimized out>, this=0x557f477a6560) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/core/unix/src/TUnixSystem.cxx:2120
+#3  TUnixSystem::StackTrace (this=0x557f477a6560) at /home/e12exp/ssd/builds/FairSoft_build/Source/root/core/unix/src/TUnixSystem.cxx:2411
+#4  0x00007fc72e0de779 in FairLogger::LogFatalMessage () at /home/e12exp/ssd/FairRoot/fairroot/tools/FairLogger.cxx:196
+#5  0x00007fc72e0a3d9c in std::function<void ()>::operator()() const (this=0x7fc72e0d0980 <fair::Logger::fFatalCallback>) at /usr/include/c++/13/bits/std_function.h:587
+#6  fair::Logger::~Logger (this=0x7fff7cd742d0, __in_chrg=<optimized out>) at /home/e12exp/ssd/builds/FairSoft_build/Source/fairlogger/logger/Logger.cxx:276
+#7  0x00007fc72d710e62 in R3BUcesbSource::InitUnpackers (this=0x557f4faa2620) at /usr/include/c++/13/bits/allocator.h:184
+#8  0x00007fc72e19cb9c in FairRunOnline::Init (this=0x557f58a0c730) at /usr/include/c++/13/bits/unique_ptr.h:199
+#9  0x00007fc739e8fde1 in ?? ()
+#10 0x0000000000000000 in ?? ()

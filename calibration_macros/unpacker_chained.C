@@ -21,7 +21,7 @@ typedef struct EXT_STR_h101_t
     EXT_STR_h101_WRCALIFA_t wrcalifa;
 } EXT_STR_h101;
 
-void califa_offline_unpacker(int nev = -1)
+void unpacker_chained(int nev = -1)
 {
     TStopwatch timer;
 
@@ -40,11 +40,11 @@ void califa_offline_unpacker(int nev = -1)
     // TString inputFileName="main0070_all.lmd";
     //TString inputFileName="--stream=lxlanddaq01:9000";
     TString inputFile;   //use wildcard
-    TString in_dir = "/home/e12exp/ssd/data_calibration/lmd/"; //the directory of your lmd file
-    TString inputFileName = in_dir+"analog_proton_760mV*.lmd";  //number of input lmd files (with wildcard *)
+    TString in_dir = "/home/e12exp/ssd/data_calibration/lmd/board_proton/"; //the directory of your lmd file
+    TString inputFileName = in_dir+"*.lmd";  //number of input lmd files (with wildcard *)
     // Output file ------------------------------------------
     TString out_dir = "/home/e12exp/ssd/data_calibration/unpacked/"; //directory where you want to store the unpacked file
-    TString outputFileName = out_dir+"analog_proton_760mV_all.root";
+    TString outputFileName = out_dir+"board_proton_06_07_all.root";
 
     bool Cal_level = true;          // set true if there exists a file with the calibration parameters
     bool NOTstoremappeddata = false; // if true, don't store mapped data in the root file

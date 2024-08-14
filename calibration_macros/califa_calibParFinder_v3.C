@@ -30,9 +30,12 @@ void califa_calibParFinder_v3() {
   cin>>inputFile;
   TString in_dir = "/home/e12exp/ssd/data_calibration/unpacked/";
   TString currentDir = gSystem->Getenv("PWD"); //directory in which macros are stored 
-  TString filename = in_dir+inputFile+".root";    //unpacked .root file
+  //TString filename = in_dir+inputFile+".root";    //unpacked .root file
+  TString filename = "/home/e12exp/ssd/data_calibration/unpacked/7_8V_05_07_001_001.root";
+  
   TString out_dir = "/home/e12exp/ssd/data_calibration/calibrated/";
-  TString outputFileName = out_dir+inputFile+"_calibrated.root"; //Output calibrated file
+  //TString outputFileName = out_dir+inputFile+"_calibrated.root"; //Output calibrated file
+  TString outputFileName = "/home/e12exp/ssd/data_calibration/unpacked/7_8V_05_07_001_001_calibrated.root"; //Output calibrated file
 
   // Parameters for CALIFA
   //TString dir = gSystem->Getenv("VMCWORKDIR");
@@ -42,7 +45,8 @@ void califa_calibParFinder_v3() {
   califamapfilename.ReplaceAll("//", "/");
 
   // CALIFA output file with the parameters calibrated in keV
-  TString outputCalFile = out_dir+inputFile+"_calibrated.par";
+  //TString outputCalFile = out_dir+inputFile+"_calibrated.par";
+  TString outputCalFile = "/home/e12exp/ssd/data_calibration/unpacked/7_calibrated.par";
 
   // Create source using ucesb for input ------------------
   // EXT_STR_h101 ucesb_struct;
