@@ -57,7 +57,11 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     /** Virtual method ReInit **/
     virtual InitStatus ReInit();
 
-    /** Virtual method Search peaks and calibrate **/
+
+    /** Virtual method Pulser Calibration **/
+    virtual void PulserCalibration();
+
+    /** Virtual method Search peaks **/
     virtual void SearchPeaks();
 
     /** Virtual method Fit peaks **/
@@ -76,7 +80,18 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     const Double_t GetThreshold() { return fThreshold; }
     const Int_t GetNumParameterFit() { return fNumParam; }
     const Int_t GetMinStadistics() { return fMinStadistics; }
+    const Int_t GetRunId() { return fRunId; }
+    
     const TString GetSourceName() { return fSourceName; }
+    const TString GetSpectrumName() { return fSpectrumName; }	
+    const TString GetoutputName() { return foutputName; }
+    const TString GetCalName() { return fCalName; }
+    const TString Getcalifamapfilename() { return fcalifamapfilename; }
+    
+    
+    const Double_t GetMaxSigma() { return fMaxSigma; }
+    const Int_t GetMinPeakEvents() { return fMinPeakEvents; }
+    const Int_t GetPulserNumber() { return fPulserNumber; }
 
     TArrayF* GetEnergyPeaks() { return fEnergyPeaks; }
 
@@ -104,7 +119,19 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     void SetGausBaseEnergy(Double_t gausBaseEnergy) { fGausBaseEnergy = gausBaseEnergy; }
     void SetNumParameterFit(Int_t numberParFit) { fNumParam = numberParFit; }
     void SetMinStadistics(Int_t minstad) { fMinStadistics = minstad; }
-    void SetSourceName(TString sourceName) { fSourceName = sourceName; }
+    void SetSourceName(TString SourceName) { fSourceName = SourceName; }
+    void SetSpectrumName(TString SpectrumName) { fSpectrumName = SpectrumName; }
+    void SetoutputName(TString outputName) { foutputName = outputName; }
+    void SetCalName(TString CalName) { fCalName = CalName; }
+    void SetRunId(Int_t RunId) { fRunId = RunId; }
+    void Setcalifamapfilename(TString califamapfilename) { fcalifamapfilename = califamapfilename; }
+    
+    
+    
+    void SetMaxSigma(Double_t MaxSigma) { fMaxSigma = MaxSigma; }
+    void SetMinPeakEvents(Int_t MinPeakEvents) { fMinPeakEvents = MinPeakEvents; }
+    void SetPulserNumber(Int_t PulserNumber) { fPulserNumber = PulserNumber; }
+    
 
     void SetDebugMode(Bool_t debug) { fDebugMode = debug; }
 
@@ -138,7 +165,7 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     Double_t fSigLowThreshold;
     Double_t fSigHighThreshold;
     Double_t fMinWidth;
-
+    
     Double_t fMinSlope;
     Double_t fMinSlopeP;
     Double_t fMaxSlope;
@@ -148,8 +175,17 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     Double_t fGausRangeP;
     Double_t fGausBaseEnergy;
 
-    TString fSourceName;
+    Double_t fMaxSigma;
+    Int_t fMinPeakEvents;
+    Int_t fPulserNumber;
+    Int_t fRunId;
 
+    TString fSourceName;
+    TString fSpectrumName;
+    TString foutputName;
+    TString fCalName;
+    TString fcalifamapfilename;
+    
     TArrayF* fEnergyPeaks;
     Double_t* fChannelPeaks;
 
