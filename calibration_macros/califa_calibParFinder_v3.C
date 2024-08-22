@@ -1,3 +1,6 @@
+#include<boost/filesystem.hpp>
+#include"TSystem.h"
+
 typedef struct EXT_STR_h101_t {
   EXT_STR_h101_unpack_t unpack;
   EXT_STR_h101_CALIFA_t califa;
@@ -34,22 +37,100 @@ void califa_calibParFinder_v3()
   
   
   //_____________________________choose function____________________________________________//
-  Int_t choice;
-  TString sourcename;
-  cout<<"1. Write spectra (Writes spectra for each crystal into a spectrum.root file)"<<endl;
-  cout<<"2. Pulser calibration (Performs calibration procedure and writes output to a calibration.root file and fitting parameters to a .par file)"<<endl;
-  cout<<"Choose function: (1 or 2)";
-  cin>>choice;
   
-  if(choice==1)
-  sourcename = "spectrum";
-  else if(choice==2)
-  sourcename = "22Na_pulser";
-  else{
-  cerr<<"Not a valid choice. Please enter either 1 or 2!"<<endl;
-  return;  
-  }
+  TString filename, outputFileName, SpectrumFileName, outputCalFile, califamapfilename;
+  TString ynchoice, sourcename;
+  cout<<"Do you have a spectrum.root file ? (file with energy spectra histograms for each crystal)"<<endl;
+  cout<<"Enter yes/no:";
+  cin>>ynchoice;
   
+  Bool_t flag1; //flag=true for a valid choice, false for incorrect choice
+  do{
+  	if(ynchoice=="y"||ynchoice=="yes"){	//if spectrum file exists
+  	flag1=true;
+  	cout<<"Enter name of spectrum.root file (with full path):";
+  	Bool_t flag2;
+	  	do{
+	  	cin>>SpectrumFileName;
+	  	ifstream file(SpectrumFileName);
+	  	string specfile = string(SpectrumFileName);
+	  		if(file && specfile.substr(specfile.length() - 5)==".root"){
+	  		flag2=true;
+	  		}
+	  		else{
+	  		flag2=false;
+	  		cout<<"File does not exist ! Please re-enter the correct filename:";
+	  		}
+	  	}while(!flag2);
+	sourcename="22Na_pulser";  	
+  	}
+  	
+  	else if(ynchoice=="n"||ynchoice=="no"){	//if spectrum file doesn't exist
+  	flag1=true; 
+  	cout<<"Enter name of unpacked input .root file (with full path):";
+  	Bool_t flaginp;
+  		do{
+  		cin>>filename;
+  		ifstream fileinp(filename);
+  		string strfile = string(filename);
+  			if(fileinp && strfile.substr(strfile.length() - 5)==".root"){	//input .root file exists
+  			flaginp=true;
+  			}
+  			else{			//input .root doesn't exist
+  			flaginp=false;
+  			cout<<"File does not exist ! Please re-enter the correct filename:";
+  			}
+  		}while(!flaginp);
+  		
+  	cout<<"Enter name for output spectrum .root file (with full path):";
+  	Bool_t flagspect;
+  		do{
+    		cin>>SpectrumFileName;
+    		string strspect = string(SpectrumFileName);  
+    		size_t found = strspect.find_last_of("/");
+    		string path = strspect.substr(0, found);    
+	    		if(strspect.substr(strspect.length() - 5)!=".root"){
+	    		flagspect=false;
+	    		cout<<"Output spectrum file must end with '.root' !"<<endl;
+	    		cout<<"please re-enter correct filename:";
+	    		}
+	    		else if(!gSystem->cd(path.c_str())){
+	    		flagspect=false;
+	    		cout<<"Specified directory doesn't exist !"<<endl;
+	    		cout<<"Please re-enter correct filepath:";
+	    		}
+			else{
+			flagspect=true;
+			}
+    		}while(!flagspect);	
+    	sourcename = "spectrum";	//source is set to spectrum, will now create spectrum.root file
+  	}
+  	else{
+	cout<<"Invalid choice !";
+	cout<<"\n"<<"Please re-enter your choice:";
+	cin>>ynchoice;
+	}
+  }while(!flag1);
+  
+  //cout<<"Sourcename:"<<sourcename<<endl;
+  
+  //Mapping parameters for CALIFA
+  Bool_t flag3;
+  cout<<"Choose input mapping parameters file (with full path):";
+  do{
+  	cin>>califamapfilename;
+	ifstream file(califamapfilename);
+	string calfile = string(califamapfilename);
+		if(file && calfile.substr(calfile.length() - 4)==".par"){
+	  	flag3=true;
+	  	}
+	  	else{
+	  	flag3=false;
+	  	cout<<"File does not exist ! Please re-enter the correct filename:";
+	  	}
+   }while(!flag3);
+   califamapfilename.ReplaceAll("//", "/");  
+
   //run HistoFill first if you don't already have the specific spectrum.root file for your data!!!!!!
   
   //HistoFill: Fill Histogramms, create spectrum.root (spectrum)
@@ -57,15 +138,18 @@ void califa_calibParFinder_v3()
   //PulserCalibration: ... (22Na_pulser, 60Co_pulser, AmBe_pulser, 152Eu_pulser)
   
 
-  // confirm execution for "fitting" and "spectrum"
-  if (sourcename == "spectrum" /*|| sourcename == "fitting" */) 
+  // confirm execution for "fitting" and "spectrum"   --> Deactivated by MJ for now
+  /*
+  if (sourcename == "spectrum" || sourcename == "fitting") 
   {
+     
      if (!confirmExecution(string(sourcename.Data()))) 
      {
          return;
      }
+     
   }
-  
+  */
   
   //________________________Create source using ucesb for input___________________________//
   /*
@@ -88,7 +172,7 @@ void califa_calibParFinder_v3()
   califamapfilename.ReplaceAll("//", "/");
   */
   
-  TString filename, outputFileName, SpectrumFileName, outputCalFile, califamapfilename;
+  /*
   //Input file
   cout<<"Choose input file name (with full path):";  
   cin>>filename;
@@ -99,14 +183,12 @@ void califa_calibParFinder_v3()
   cin>>califamapfilename;
   califamapfilename.ReplaceAll("//", "/");  
   cout<<"\n"<<"Mapping .par filename entered"<<endl;
-  
+  */
   
   //________________________________________HistoFill, FitPeaks________________________________________________//
 
   if (sourcename == "spectrum" /*|| sourcename == "fitting" */) 
-  {
-          cout<<"\n"<<"Choose name of output spectrum file (with full path):";
-          cin>>SpectrumFileName;  
+  {         
           
           // Create run  --------------------------------------------------------------
 	  FairRunAna *run = new FairRunAna();
@@ -199,27 +281,82 @@ void califa_calibParFinder_v3()
       }
       
       //rtdb->saveOutput();
+      
+  TString nextchoice; 
+  Bool_t flagok;   
+  cout<<"Completed writing to spectrum file:"<<SpectrumFileName;
+  cout<<"Do you want to continue with the calibration procedure? : (yes/no)";
+  do{
+	  cin>>nextchoice;
+	  if(nextchoice=="yes" || "y"){
+	  flagok=true;
+	  sourcename = "22Na_pulser";
+	  }    
+	  else if(nextchoice=="no" || "n"){
+	  flagok=true;
+	  cout<<"You have chosen not to continue with calibration.";
+	  }
+	  else{
+	  flagok=false;
+	  cout<<"Invalid choice entered ! Please re-enter your choice:";
+	  }
+  }while(!flagok);
+  
   }
 
 
   //______________________________________PulserCalibration__________________________________________________//
 
 
-  if (sourcename == "22Na_pulser" || sourcename == "60Co_pulser" || sourcename == "AmBe_pulser"  || sourcename == "152Eu_pulser" )
+  if (sourcename == "22Na_pulser" /*|| sourcename == "60Co_pulser" || sourcename == "AmBe_pulser"  || sourcename == "152Eu_pulser" */ )
   {
-    
-    cout<<"\n"<<"Choose name of output spectrum file (with full path):";
-    cin>>SpectrumFileName;
-          
+                
     // CALIFA output file with the parameters calibrated in keV
+    Bool_t flag4;
     cout<<"\n"<<"Enter name for output parameters file (with full path, with extension as .par):";
-    cin>>outputCalFile;         
-    cout << "\n"<<"Output .par filename entered" << endl;
+    do{
+    	cin>>outputCalFile;
+    	string stroutCalFile = string(outputCalFile);  
+    	size_t found = stroutCalFile.find_last_of("/");
+    	string path = stroutCalFile.substr(0, found);    
+    		if(stroutCalFile.substr(stroutCalFile.length() - 4)!=".par"){
+    		flag4=false;
+    		cout<<"Output parameter file must end with '.par' !"<<endl;
+    		cout<<"please re-enter correct filename:";
+    		}
+    		else if(!gSystem->cd(path.c_str())){
+    		flag4=false;
+    		cout<<"Specified directory doesn't exist !"<<endl;
+    		cout<<"Please re-enter correct filepath:";
+    		}
+		else{
+		flag4=true;
+		}
+    }while(!flag4);
     
     //Calibrated .root file
-    cout<<"Enter name for calibrated root file (with full path, with extension as .root):";
-    cin>>outputFileName;
-    cout << "\n"<<"Output .root filename entered" << endl;
+    Bool_t flag5;
+    cout<<"\n"<<"Enter name for output calibrated root file (with full path, with extension as .root):";
+    do{
+    	cin>>outputFileName;
+    	string stroutrootfile = string(outputFileName);  
+    	size_t found = stroutrootfile.find_last_of("/");
+    	string path = stroutrootfile.substr(0, found);    
+    		if(stroutrootfile.substr(stroutrootfile.length() - 5)!=".root"){
+    		flag5=false;
+    		cout<<"Output root file must end with '.root' !"<<endl;
+    		cout<<"please re-enter correct filename:";
+    		}
+    		else if(!gSystem->cd(path.c_str())){
+    		flag5=false;
+    		cout<<"Specified directory doesn't exist !"<<endl;
+    		cout<<"Please re-enter correct filepath:";
+    		}
+		else{
+		flag5=true;
+		}
+    }while(!flag5);
+    
     
     // R3BCalifaMapped2CrystalCalPar ----
     cout << "before setting calib peak parameters..." << endl;
@@ -280,8 +417,9 @@ void califa_calibParFinder_v3()
     CalPar->SetPulserNumber(3);
     
     //call PulserCalibration function
+    cout<<"Calling pulser calibration function";
     CalPar->PulserCalibration();
-
+    cout << "Output file is " << outputFileName << endl;
   }
 
 
@@ -302,7 +440,6 @@ void califa_calibParFinder_v3()
   Double_t ctime = timer.CpuTime() / 60.;
   cout << endl << endl;
   cout << "Macro finished succesfully." << endl;
-  cout << "Output file is " << outputFileName << endl;
   cout << "Real time " << rtime << " min, CPU time " << ctime << " min"
             << endl
             << endl;

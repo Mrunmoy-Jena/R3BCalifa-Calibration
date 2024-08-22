@@ -620,7 +620,7 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
 	                TGraph* graph = new TGraph(fNumPeaks, X, Y);
 	                graph->Fit("f1fit", "Q"); // Quiet mode (minimum printing)
 	                
-		            cout << "Fit X, Y Werte: " << X[0] << ", " << X[1] << ", " << Y[0] << ", " << Y[1] << endl;
+		            //cout << "Fit X, Y Werte: " << X[0] << ", " << X[1] << ", " << Y[0] << ", " << Y[1] << endl;
 
 		            //pass slope and offset
 	                for (Int_t h = 0; h < numPars; h++)
@@ -629,7 +629,7 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
 	                
 	                    Double_t parameterValue = f1fit->GetParameter(h);
                         fCal_Par->SetCryCalParams(parameterValue, numPars*i+h);
-                        cout << "Parameter " << numPars*i+h << " set to " << parameterValue << endl;
+                        cout << "Parameter " << h << " set to " << parameterValue << endl;
 
 	                }
   
