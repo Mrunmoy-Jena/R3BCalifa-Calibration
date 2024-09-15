@@ -7,11 +7,11 @@ TString SpectrumFileName;
 
 //___________________________________________________________________change file names and select parameters/functions___________________________________________________________________//
 
-TString short_filename_gamma = "analog_gamma_07_07_all";       // analog_gamma_07_07_all   
-TString folder_name_gamma = "/home/e12exp/data_calibration/Juli_data/7_7/";     // 7_7
+TString short_filename_gamma = "gamma_pulser_comb";       //   gamma_onlysource_comb     gamma_pulser_comb 
+TString folder_name_gamma = "/home/e12exp/data_calibration/September_data/11_9/";     // September_data/11_9
 
-TString short_filename_proton = "analog_proton_10x_wo780mV";       // analog_proton_10x_05_07_all   analog_proton_79mV_05_07_comb   analog_proton_780mV_05_07_comb    analog_proton_7_8V_05_07_comb   analog_proton_10x_wo780mV
-TString folder_name_proton = "/home/e12exp/data_calibration/Juli_data/6_7/";     // 6_7
+TString short_filename_proton = "proton_pulser_comb";       //  proton_onlysource_comb    proton_pulser_comb
+TString folder_name_proton = "/home/e12exp/data_calibration/September_data/11_9/";     // September_data/11_9
 
 // input root file with collected data
 TString filename_gamma = folder_name_gamma + "rootfiles/" + short_filename_gamma + ".root";
@@ -22,16 +22,16 @@ TString SpectrumFileName_gamma = folder_name_gamma + "spectra/" + short_filename
 TString SpectrumFileName_proton = folder_name_proton + "spectra/" + short_filename_proton + "_spectrum.root";
 
 // output file with calibrated histograms
-TString outputFileName = folder_name_gamma + "rootfiles/" + short_filename_gamma + "_calibrated.root";
+TString outputFileName = folder_name_proton + "rootfiles/" + short_filename_proton + "_calibrated.root";
 
 // CALIFA output file with the parameters calibrated in keV
-TString outputCalFile = folder_name_gamma + "CalPar/" + short_filename_gamma + ".par";
+TString outputCalFile = folder_name_proton + "CalPar/" + short_filename_proton + ".par";
 
 // Parameters for CALIFA
 TString califamapfilename = "/home/e12exp/data_calibration/param_files/califamapping_v1.par";
 
 // all errors from calibration: peak number, ...
-TString PeakErrors = "/home/e12exp/data_calibration/Juli_data/peak_errors.txt";
+TString PeakErrors = "/home/e12exp/data_calibration/September_data/peak_errors.txt";
 
 // source_energies in keV
 Float_t source_energies[] = {511.0, 1274.5};
@@ -54,22 +54,26 @@ void pulser_calibration_v1()
     
     sourcename = "spectrum";
     
+    
     // create gamma_spectrum.root
     filename = filename_gamma;
     SpectrumFileName = SpectrumFileName_gamma;    
     califa_calibParFinder_v3();
-
+    
+    
+    /*
     // create proton_spectrum.root
     filename = filename_proton;
     SpectrumFileName = SpectrumFileName_proton;
     califa_calibParFinder_v3();
+    */
     
-
+    /*
     // calibration 
     sourcename = "pulser";
     califa_calibParFinder_v3();
+    */
     
     gApplication->Terminate();
 }
-
 
