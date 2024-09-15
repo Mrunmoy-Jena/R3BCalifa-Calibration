@@ -36,7 +36,7 @@ void createSpectrum()
     // Set up R3BHeader 
     R3BEventHeader *EvntHeader = new R3BEventHeader();
     run->SetEventHeader(EvntHeader);
-    run->SetSink(new FairRootFileSink(outputFileName));
+    //run->SetSink(new FairRootFileSink(outputFileName));
 
     // Runtime data base 
     FairRuntimeDb *rtdb = run->GetRuntimeDb();
@@ -98,13 +98,15 @@ void createSpectrum()
     run->Init();
     FairLogger::GetLogger()->SetLogScreenLevel("INFO");   // INFO, WARNING, DEBUG
 
+    /*
     //output Ascii file with the Calibration Parameters
     FairParAsciiFileIo *parOut = new FairParAsciiFileIo();
     parOut->open(outputCalFile, "out");
     rtdb->setOutput(parOut);
 
     cout << "after setting parOut" << endl;
-
+    */
+    
     if (nev > -1) {
       run->Run(nev);
     }
@@ -113,7 +115,7 @@ void createSpectrum()
       run->Run();
     }
 
-    rtdb->saveOutput();
+    //rtdb->saveOutput();
 
     cout << endl << endl;
     cout << "Spectrum created succesfully." << endl;
