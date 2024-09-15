@@ -196,7 +196,7 @@ InitStatus R3BCalifaMapped2CrystalCalPar::Init()
         fh_Map_energy_crystal = new TH1F*[fNumCrystals];
     }
     for (Int_t i = 0; i < fNumCrystals; i++)
-        if (fMap_Par->GetInUse(i + 1) == 1)
+        //if (fMap_Par->GetInUse(i + 1) == 1)
         {
 
             sprintf(name1, "fh_Map_energy_crystal_"+fSourceName+"_%i", i + 1);
@@ -260,8 +260,8 @@ void R3BCalifaMapped2CrystalCalPar::Exec(Option_t* opt)
         crystalId = MapHit[i]->GetCrystalId();
         
         // Fill histograms
-        if (fMap_Par->GetInUse(crystalId) == 1)
-        {
+        //if (fMap_Par->GetInUse(crystalId) == 1)
+        //{
 	        Double_t fleft, fright;
 	        if (crystalId<=fNumCrystals/2)
 	        {
@@ -286,7 +286,7 @@ void R3BCalifaMapped2CrystalCalPar::Exec(Option_t* opt)
 		            fh2_Map_crystal_proton->Fill(crystalId-1,MapHit[i]->GetEnergy());
 		        }
 	        }
-	    }	
+	    //}	
 	
     }
 
