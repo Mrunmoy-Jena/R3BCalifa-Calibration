@@ -7,6 +7,7 @@ typedef struct EXT_STR_h101_t {
 
 
 //_______________________________________confirmation_______________________________________________//
+
 bool confirmExecution() 
 {
     string input;
@@ -28,6 +29,7 @@ bool confirmExecution()
 
 
 //________________________________________HistoFill________________________________________________//
+
 void createSpectrum() 
 {
     // Create run
@@ -125,6 +127,7 @@ void createSpectrum()
 
 
 //______________________________________PulserCalibration__________________________________________________//
+
 void pulserCalibration() 
 {     
 
@@ -171,23 +174,41 @@ void pulserCalibration()
     CalPar->SetMinStadistics(200);
     CalPar->SetNumParameterFit(2);
     
-    // Gamma range
+    //______Gamma range______//
+    // set boundaries for histogram sizes
     CalPar->SetCalRange_left(0);
     CalPar->SetCalRange_right(30000);
     CalPar->SetCalRange_bins(3000);
     
-    // particle range
+    // set boundaries for peak finding
+    CalPar->SetSourcePeaks_left(500);    
+    CalPar->SetSourcePeaks_right(1300);
+    CalPar->SetPulserPeaks_left(1300);
+    CalPar->SetPulserPeaks_right(30000);
+    
+    
+    //______particle range______//
     CalPar->SetCalRangeP_left(0);
     CalPar->SetCalRangeP_right(30000);
     CalPar->SetCalRangeP_bins(30000);
     
+    CalPar->SetSourcePeaksP_left(50);    
+    CalPar->SetSourcePeaksP_right(110);
+    CalPar->SetPulserPeaksP_left(110);
+    CalPar->SetPulserPeaksP_right(30000);
+    
+    CalPar->SetOffsetCalibration(offset_calibration);
+    
     CalPar->SetSigma(2.0);
     CalPar->SetThreshold(0.05);
+    
     CalPar->SetMaxPeaks(20);
     CalPar->SetChi2Threshold(-3);
     CalPar->SetSigLowThreshold(3.0);
     CalPar->SetSigHighThreshold(500.);
     CalPar->SetMinWidth(1.0);
+    
+    
     CalPar->SetGausRange(30.0);
     CalPar->SetGausRangeP(5.0);
     CalPar->SetGausBaseEnergy(511.0);
@@ -195,6 +216,7 @@ void pulserCalibration()
     CalPar->SetMaxSlope(1.6);
     CalPar->SetMinSlopeP(10.0);
     CalPar->SetMaxSlopeP(16.0);
+
 
     CalPar->SetMaxSigma(50.0);
     CalPar->SetMinPeakEvents(100.0);
@@ -212,6 +234,7 @@ void pulserCalibration()
 
 
 //_______________________________________califa_calibParFinder_v3_____________________________________________________//
+
 void califa_calibParFinder_v3()
 {
     TStopwatch timer;
@@ -232,7 +255,7 @@ void califa_calibParFinder_v3()
     }
     else
     {
-        cout << "You have selected a non-existent detector range: '" << sourcename << "', Change range!" << endl;
+        cout << "You have selected a non-existent function: '" << sourcename << endl;
     }
     
     
