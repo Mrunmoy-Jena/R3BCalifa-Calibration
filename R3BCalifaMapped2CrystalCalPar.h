@@ -106,6 +106,17 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     void SetCalRangeP_left(Int_t Histos_left) { fMapHistos_leftp = Histos_left; }
     void SetCalRangeP_right(Int_t Histos_right) { fMapHistos_rightp = Histos_right; }
     void SetCalRangeP_bins(Int_t Histos_bins) { fMapHistos_binsp = Histos_bins; }
+    
+    void SetSourcePeaks_left(Int_t SourcePeaks_left) { fSourcePeaks_left = SourcePeaks_left; }
+    void SetSourcePeaks_right(Int_t SourcePeaks_right) { fSourcePeaks_right = SourcePeaks_right; }
+    void SetPulserPeaks_left(Int_t PulserPeaks_left) { fPulserPeaks_left = PulserPeaks_left; }
+    void SetPulserPeaks_right(Int_t PulserPeaks_right) { fPulserPeaks_right = PulserPeaks_right; }
+    
+    void SetSourcePeaksP_left(Int_t SourcePeaksP_left) { fSourcePeaksP_left = SourcePeaksP_left; }
+    void SetSourcePeaksP_right(Int_t SourcePeaksP_right) { fSourcePeaksP_right = SourcePeaksP_right; }
+    void SetPulserPeaksP_left(Int_t PulserPeaksP_left) { fPulserPeaksP_left = PulserPeaksP_left; }
+    void SetPulserPeaksP_right(Int_t PulserPeaksP_right) { fPulserPeaksP_right = PulserPeaksP_right; }    
+
     void SetNumPeaks(Int_t numberpeaks) { fNumPeaks = numberpeaks; }
     void SetNumVoltages_gamma(Int_t numbervoltages_gamma) { fNumVoltages_gamma = numbervoltages_gamma; }
     void SetNumVoltages_proton(Int_t numbervoltages_proton) { fNumVoltages_proton = numbervoltages_proton; }
@@ -138,12 +149,12 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     void SetPeaksCalibrated(TString PeaksCalibrated) { fPeaksCalibrated = PeaksCalibrated; }
     void SetPeakErrors(TString PeakErrors) { fPeakErrors = PeakErrors; }
     
-    
     void SetMaxSigma(Double_t MaxSigma) { fMaxSigma = MaxSigma; }
     void SetMinPeakEvents(Int_t MinPeakEvents) { fMinPeakEvents = MinPeakEvents; }
     void SetPulserNumber(Int_t PulserNumber) { fPulserNumber = PulserNumber; }
     
-
+    void SetOffsetCalibration(Double_t OffsetCalibration) { fOffsetCalibration = OffsetCalibration; }
+    
     void SetDebugMode(Bool_t debug) { fDebugMode = debug; }
 
     void SetEnergyPeaks(TArrayF* thePeaks)
@@ -176,10 +187,20 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     Int_t fMapHistos_leftp; // particle range
     Int_t fMapHistos_rightp;
     Int_t fMapHistos_binsp;
+    
+    Int_t fSourcePeaks_left;
+    Int_t fSourcePeaks_right;
+    Int_t fPulserPeaks_left;
+    Int_t fPulserPeaks_right;
+    Int_t fSourcePeaksP_left;
+    Int_t fSourcePeaksP_right;
+    Int_t fPulserPeaksP_left;
+    Int_t fPulserPeaksP_right;
 
     Int_t fNumParam;
     Int_t fMinStadistics;
-
+    Int_t fNumParam_Source;
+    
     Int_t fNumPeaks;
     Int_t fNumVoltages_gamma;
     Int_t fNumVoltages_proton;
@@ -205,7 +226,9 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     Int_t fMinPeakEvents;
     Int_t fPulserNumber;
     Int_t fRunId;
-
+    
+    Double_t fOffsetCalibration;
+    
     TString fSourceName;
     TString fSpectrumName;
     TString fSpectrumName_gamma;
@@ -223,6 +246,8 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     
     
     Double_t* fChannelPeaks;
+    Double_t* fChannelPeaks_source;
+    Double_t* fChannelPeaks_pulser;
 
     R3BCalifaMappingPar* fMap_Par;     /**< Parameter container with mapping. >*/
     R3BCalifaCrystalCalPar* fCal_Par;  /**< Container for Cal parameters. >*/
