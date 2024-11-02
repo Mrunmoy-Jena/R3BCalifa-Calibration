@@ -65,8 +65,8 @@ TString PeakErrors = folder_name + "peak_errors.txt";
 // Parameters for CALIFA
 TString califamapfilename = "/home/e12exp/data_calibration/param_files/califamapping_v1.par";
 
-// CrystalID <-> angles
-TString anglesfilename = "/home/e12exp/crystalID_angles.txt";
+// CrystalID <-> angles, FEBEX, ...
+TString anglesfilename = "/home/e12exp/califa_specs.txt";
 
 // source_energies in keV
 Double_t source_energies[] = {1274.5};

@@ -46,6 +46,7 @@
 #include <stdlib.h>
 #include <TCanvas.h>
 #include <numeric>
+#include <TStyle.h>
 using namespace std;
 
 R3BCalifaMapped2CrystalCalPar::R3BCalifaMapped2CrystalCalPar()
@@ -383,9 +384,17 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
         cerr << "Error: The file '" << fPeakErrors << "' could not be created!" << endl;
     }
     
-    // read CrystalID-angles
+    // read CrystalID-angles and other parameters
     vector<float> theta_angles(fNumCrystals + 1);  // +1 to align indices with CrystalIDs starting at 1
     vector<float> phi_angles(fNumCrystals + 1);
+    vector<int> half_vals(fNumCrystals + 1);
+    vector<int> ring_vals(fNumCrystals + 1);
+    vector<int> preamp_vals(fNumCrystals + 1);
+    vector<int> channel_vals(fNumCrystals + 1);
+    vector<int> febex_pc_vals(fNumCrystals + 1);
+    vector<int> febex_sfp_vals(fNumCrystals + 1);
+    vector<int> febex_mod_vals(fNumCrystals + 1);
+    vector<int> febex_ch_vals(fNumCrystals + 1);
 
     ifstream angles_file(fanglesfilename);
     if (!angles_file.is_open()) {
@@ -398,18 +407,27 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
 
     int id;
     float theta, phi;
+    int half, ring, preamp, channel, febex_pc, febex_sfp, febex_mod, febex_ch;
     string extra;
 
     vector<bool> found_ids(fNumCrystals + 1, false); // Track found IDs
 
-    while (angles_file >> id >> theta >> phi) 
+    while (angles_file >> id >> theta >> phi >> extra >> half >> ring >> preamp >> channel >> febex_pc >> febex_sfp >> febex_mod >> febex_ch) 
     {
-        getline(angles_file, extra);  // Ignore the rest of the line
+        getline(angles_file, extra);  // Ignore any remaining part of the line after FEBEX_CH
 
         // Ensure ID is within the valid range for the vectors (1 to fNumCrystals)
         if (id >= 1 && id <= fNumCrystals) {
             theta_angles[id] = theta;
             phi_angles[id] = phi;
+            half_vals[id] = half;
+            ring_vals[id] = ring;
+            preamp_vals[id] = preamp;
+            channel_vals[id] = channel;
+            febex_pc_vals[id] = febex_pc;
+            febex_sfp_vals[id] = febex_sfp;
+            febex_mod_vals[id] = febex_mod;
+            febex_ch_vals[id] = febex_ch;
             found_ids[id] = true;  // Mark this ID as found
         } else {
             cerr << "Warning: CrystalID " << id << " is out of range." << endl;
@@ -425,9 +443,7 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
             cerr << "Error: CrystalID " << i << " is missing in the file." << endl;
         }
     }
-    
-    
-    
+
     //___________________________________________________calibration____________________________________________________________________//
     //fNumPeaks corresponds to the number of source energy values ​​specified in the macro, fNumVoltages corresponds to the number of different pulser signals
     Double_t Num_all_peaks_gamma = fNumVoltages_gamma+fNumPeaks;
@@ -437,30 +453,37 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
     TH1F* local_fh_Map_energy_crystal[fNumCrystals];
     
     TH2F* PeaksFoundVsCrystal = new TH2F("Peaks_vs_Crystal", "Peaks vs Crystal ID; Crystal ID; Bin number", fNumCrystals, 0, fNumCrystals, 10000, 0, 30000);
-    TH2F* SourcePeaksFoundGammaVsCrystal = new TH2F("gamma_source_peaks_vs_Crystal", "SourcePeaksGamma vs Crystal ID; Crystal ID; Bin number", fNumCrystals, 0, fNumCrystals, 2000, 0, 2000);
-    TH2F* SourcePeaksFoundProtonVsCrystal = new TH2F("proton_source_peaks_vs_Crystal", "SourcePeaksProton vs Crystal ID; Crystal ID; Bin number", fNumCrystals, 0, fNumCrystals, 2000, 0, 200);
-    TH2F* PeaksCalibratedGammaVsCrystal = new TH2F("gamma_peaks_calibrated_vs_Crystal", "PeaksCalibratedGamma vs Crystal ID; Crystal ID; Energy in MeV", fNumCrystals, 0, fNumCrystals, 3000, 0, 30);
-    TH2F* PeaksCalibratedProtonVsCrystal = new TH2F("proton_peaks_calibrated_vs_Crystal", "PeaksCalibratedProton vs Crystal ID; Crystal ID; Energy in MeV", fNumCrystals, 0, fNumCrystals, 4000, 0, 400);
-    TH2F* PulserPeaksCapacityProtonVsCrystal = new TH2F("proton_pulser_peaks_capacity_vs_Crystal", "PulserPeaksProton/Capacity vs Crystal ID; Crystal ID; Energy", fNumCrystals/2, fNumCrystals/2, fNumCrystals, 4000, 0, 400);
-    
-    TH2F* RangeFactorVsCrystal = new TH2F("Range_Factor_vs_Crystal", "RangeFactor vs Crystal ID; Crystal ID; RangeFactor", fNumCrystals, 0, fNumCrystals, 1800, 8, 20);
+    TH2F* SourcePeaksFoundGammaVsCrystal = new TH2F("gamma_Source_Peaks_vs_Crystal", "Source Peaks Gamma vs Crystal ID; Crystal ID; Bin number", fNumCrystals, 0, fNumCrystals, 2000, 0, 2000);
+    TH2F* SourcePeaksFoundProtonVsCrystal = new TH2F("proton_Source_Peaks_vs_Crystal", "Source Peaks Proton vs Crystal ID; Crystal ID; Bin number", fNumCrystals, 0, fNumCrystals, 2000, 0, 200);
+    TH2F* PeaksCalibratedGammaVsCrystal = new TH2F("gamma_Peaks_Calibrated_vs_Crystal", "Peaks Calibrated Gamma vs Crystal ID; Crystal ID; Energy [MeV]", fNumCrystals, 0, fNumCrystals, 3000, 0, 30);
+    TH2F* PeaksCalibratedProtonVsCrystal = new TH2F("proton_Peaks_Calibrated_vs_Crystal", "Peaks Calibrated Proton vs Crystal ID; Crystal ID; Energy [MeV]", fNumCrystals, 0, fNumCrystals, 4000, 0, 400);
+    TH2F* PulserPeaksCapacityProtonVsCrystal = new TH2F("proton_pulser_peaks_Capacity_vs_Crystal", "Pulser Peaks Proton/Capacity vs Crystal ID; Crystal ID; Energy", fNumCrystals/2, fNumCrystals/2, fNumCrystals, 4000, 0, 400);
     TH2F* CalibratedEnergies_VoltageVsCrystal = new TH2F("proton_E/V_vs_Crystal", "E/V vs Crystal ID; Crystal ID; E/V", fNumCrystals, 0, fNumCrystals, 2000, 0, 500);
-    TH2F* Angles_RangeFactorVsThetaPhi = new TH2F("Range_Factor_vs_Theta_Phi", "Range Factor;Theta [deg];Phi [deg]", 100, 0, 100, 360, -180, 180);
     
     vector<TH2F*> CalibratedEnergies_differenceVsCrystal(fNumVoltages_proton-fNumVoltages_gamma);
+    vector<TH2F*> RangeFactorVsCrystal(fNumVoltages_gamma);
     
     for (int j = 0; j < (fNumVoltages_proton-fNumVoltages_gamma); ++j) {
         string histName = "proton_pulser_Peak_" + to_string(j + 1 + fNumVoltages_gamma) + "_E_fit/E_V_vs_CrystalID";
-        string histTitle = "proton pulser Peak " + to_string(j + 1 + fNumVoltages_gamma) + " E_fit/E_V vs Crystal ID; Crystal ID; deviation in %";
+        string histTitle = "proton pulser Peak " + to_string(j + 1 + fNumVoltages_gamma) + " E_fit/E_V vs Crystal ID; Crystal ID; Deviation [%]";
 
         CalibratedEnergies_differenceVsCrystal[j] = new TH2F(histName.c_str(), histTitle.c_str(), fNumCrystals, 0, fNumCrystals, 3000, -1, 5);
     }
     
+    for (int j = 0; j < (fNumVoltages_gamma); ++j) {
+        string histName = "Range_Factor_pulser_Peak_" + to_string(j + 1) + "_vs_CrystalID";
+        string histTitle = "Range Factor pulser Peak " + to_string(j + 1) + " vs Crystal ID; Crystal ID; Range factor";
+
+        RangeFactorVsCrystal[j] = new TH2F(histName.c_str(), histTitle.c_str(), fNumCrystals, 0, fNumCrystals, 1200, 8, 20);
+    }
+    
     // Arrays to store the x and y values ​​for the graphs
-    vector<double> xValues, xValues_gamma, xValues_proton, BinRangePeak_gamma, yOffsetValues, ySlopeValues, yOffsetPulserValues, ySlopePulserValues, ychi2, ypvalue;
+    vector<double> xValues, xValues_gamma, xValues_proton, yOffsetValues, ySlopeValues, yOffsetPulserValues, ySlopePulserValues, ychi2, ypvalue, yrangefactor;
 
     vector<vector<double>> gamma_ySigmaValues(Num_all_peaks_gamma, vector<double>());
     vector<vector<double>> proton_ySigmaValues(Num_all_peaks_proton, vector<double>());
+    
+    vector<vector<double>> BinPulserPeaks_gamma(fNumVoltages_gamma, vector<double>());
     
     // 2D Array to store calibrated Pulser Energies from Gamma Range
     vector<vector<double>> PulserEnergiesCalibrated(fNumVoltages_gamma+1, vector<double>());
@@ -625,7 +648,7 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
                     {
                     	Y[j] = fEnergyPeaks->GetAt(j);	//fills the Y array with reference energy values from fEnergyPeaks
                     	
-                    	cout << "Source Peak " << j + 1 << ", bin number: " << X[j] << endl;
+                    	cout << "Source Peak " << j + 1 << ", Bin number: " << X[j] << endl;
                     	
                         if (i<fNumCrystals/2) 
                         {
@@ -639,14 +662,8 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
 	                }
 	                else
 	                {
-	                    cout << "Pulser Peak " << j + 1 - fNumPeaks << ", bin number: " << X[j] << endl;
+	                    cout << "Pulser Peak " << j + 1 - fNumPeaks << ", Bin number: " << X[j] << endl;
 	                }
-	                
-	                
-                    if (j==(fNumPeaks) && i<fNumCrystals/2) 
-                    {
-                        BinRangePeak_gamma.push_back(X[j]);
-                    }
 	                
                     Double_t peakArea = peakHeight * sigma * sqrt(2 * M_PI);
 
@@ -665,6 +682,9 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
                     }
                 }
             
+                local_fh_Map_energy_crystal[i]->SetTitle(Form("Spectrum Crystal ID %d", i+1));
+                local_fh_Map_energy_crystal[i]->SetXTitle("Bin number");
+                local_fh_Map_energy_crystal[i]->SetYTitle("Events");
                 local_fh_Map_energy_crystal[i]->Write();
             
                 X[nfound]=0.;	//set last value in array equal to 0 (sentinel value)
@@ -704,9 +724,11 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
                     TGraph* graph = new TGraph(fNumPeaks, X, Y);
                     graph->Fit("f1fit", "Q"); // Quiet mode (minimum printing)
                     
-                    cout << "Fit X values: ";
-                    for (int a = 0; a < fNumPeaks; a++) {
+                    cout << "Fit, X values: ";
+                    for (int a = 0; a < fNumPeaks; a++) 
+                    {
                         cout << X[a];
+                        
                         if (a < fNumPeaks - a) 
                         {
                             cout << ", ";
@@ -714,7 +736,12 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
                     }
                     cout << endl;
                     
-                    cout << "Fit Y values: ";
+                    for (int a = fNumPeaks; a < (fNumPeaks + fNumVoltages_gamma); a++)
+                    {
+                        BinPulserPeaks_gamma[a-fNumPeaks].push_back(X[a]);
+                    }
+                    
+                    cout << "Fit, Y values: ";
                     for (int b = 0; b < fNumPeaks; b++) {
                         cout << Y[b];
                         if (b < fNumPeaks - b) 
@@ -767,8 +794,6 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
                     
                         PulserEnergiesCalibrated[0].push_back(i+1);
                         
-                        //cout << "Index: " << PulserEnergiesCalibrated[0].size() - 1 << endl;
-
                         Double_t PulserEnergycalibrated[fNumVoltages_gamma];
                         
                         Double_t PulserEnergyexpected[fNumVoltages_gamma];
@@ -783,7 +808,7 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
                             
                             PulserEnergiesCalibrated[v+1].push_back(PulserEnergycalibrated[v]);
                             
-                            cout << v + 1 << " Pulser energy calibrated: " << PulserEnergycalibrated[v] << endl;
+                            cout << "Pulser Peak " << v + 1 <<  ", Energy calibrated: " << PulserEnergycalibrated[v] << endl;
                         }
                         
                         
@@ -799,7 +824,7 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
                             }
                             else
                             {
-                                cout << e + 1 << " Pulser energy by voltage_gamma: " << PulserEnergyexpected[e] << endl;
+                                cout << "Pulser Peak " << e + 1 << ", Energy by voltage: " << PulserEnergyexpected[e] << endl;
                             }
                         }
                         
@@ -830,7 +855,7 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
                         
                         Double_t PulserParams[fNumParam];
                     
-                        Double_t range_factor;
+                        Double_t range_factor_sum = 0.0;
                         
                         // find corresponding Calibrated Pulser Voltages
                         bool found = false;
@@ -840,27 +865,28 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
                             if (PulserEnergiesCalibrated[0][col] == (i + 1 - fNumCrystals/2)) 
                             {
                                 found = true;
-                                
-                                //cout << "Index " << i + 1 << " found at column: " << col << endl;
-                                
+                                                                
                                 for (int num = 0; num < fNumVoltages_gamma; num++)
                                 {
                                     PulserEnergycalibrated[num] = PulserEnergiesCalibrated[num+1][col];
                                     PulserCapacities.push_back(PulserEnergycalibrated[num]/V_proton[num]);
                                     
-                                    cout << num + 1 << " Pulser energy calibrated: " << PulserEnergycalibrated[num] << endl; 
-                                    
+                                    if (num < BinPulserPeaks_gamma.size() && col < BinPulserPeaks_gamma[num].size()) 
+                                    {
+                                        range_factor_sum += BinPulserPeaks_gamma[num][col]/X_Pulser[num];
+                                        
+                                        RangeFactorVsCrystal[num]->Fill(i + 1, BinPulserPeaks_gamma[num][col]/X_Pulser[num]);
+                                        
+                                    } else 
+                                    {
+                                        cerr << "Index " << num << " or " << col << " is out of range of BinPulserPeaks_gamma." << endl;
+                                        
+                                    }
                                 }
                                 
-                                range_factor = BinRangePeak_gamma[col]/X[fNumPeaks];    // first pulser peak each
+                                yrangefactor.push_back(range_factor_sum/fNumVoltages_gamma);
                                 
-                                RangeFactorVsCrystal->Fill(i + 1, range_factor);
-                                
-                                theta = theta_angles[i+1];
-                                phi = phi_angles[i+1];
-                                Angles_RangeFactorVsThetaPhi->Fill(theta, phi, range_factor);
-                                
-                                cout << "Range factor: " << range_factor << " (" << BinRangePeak_gamma[col] << ", " << X[fNumPeaks] << ")" << ", (angles: " << theta << ", " << phi << ")" << endl;
+                                cout << "Range factor: " << range_factor_sum/fNumVoltages_gamma << endl;
                                 break;
                             }
                         }
@@ -868,6 +894,7 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
                         if (!found) 
                         {
                             cout << "Warning: no corresponding calibrated pulser voltages from gamma range found!" << endl;
+                            yrangefactor.push_back(0);
                         }
                         
                         TF1* f2fit = new TF1("f2fit", "[0]+[1]*x", fleft, fright);
@@ -895,11 +922,11 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
                             PulserParams[f] = f2fit->GetParameter(f);
                         }
                         
-                        cout << "Pulser offset: " << PulserParams[0] << endl;
-                        cout << "Pulser slope: " << PulserParams[1] << endl;
+                        cout << "Pulser Offset: " << PulserParams[0] << endl;
+                        cout << "Pulser Slope: " << PulserParams[1] << endl;
                         cout << "Chi²: " << chi2 << endl;
                         cout << "NDF: " << ndf << endl;
-                        cout << "p-Wert: " << pvalue << endl;
+                        cout << "P-value: " << pvalue << endl;
                         
                         yOffsetPulserValues.push_back(PulserParams[0]);
                         ySlopePulserValues.push_back(PulserParams[1]);
@@ -930,11 +957,11 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
                             PeaksCalibratedProtonVsCrystal->Fill(i + 1, PulserEnergycalibrated[e]/1000);
                             CalibratedEnergies_VoltageVsCrystal->Fill(i + 1, PulserEnergycalibrated[e]/V_proton[e]);
                             PulserPeaksCapacityProtonVsCrystal->Fill(i + 1, PulserEnergycalibrated[e]/(1000*PulserCapacity/50));
-                        
-                            cout << e + 1 << " Pulser energy calibrated: " << PulserEnergycalibrated[e] << endl;
+                            
+                            cout << "Pulser Peak " << e + 1 << ", Energy calibrated: " << PulserEnergycalibrated[e] << endl;
                             }
                         
-                        cout << "Pulser capacity: " << PulserCapacity << endl;
+                        cout << "Pulser Capacity: " << PulserCapacity << endl;
                         
                     }
                 }
@@ -960,40 +987,42 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
     //______________histograms_______________//
    
     //create histograms
-    TH2F* OffsetGammaVsCrystal = new TH2F("gamma_offset_vs_CrystalID", "OffsetGamma vs Crystal ID;Crystal ID;Offset", fNumCrystals, 0, fNumCrystals, 1200, -100, 100);
-    TH2F* SlopeGammaVsCrystal = new TH2F("gamma_slope_vs_CrystalID", "SlopeGamma vs Crystal ID;Crystal ID;Slope", fNumCrystals, 0, fNumCrystals, 1000, 0, 10);
-    TH2F* OffsetProtonVsCrystal = new TH2F("proton_offset_vs_CrystalID", "OffsetProton vs Crystal ID; Crystal ID; Offset", fNumCrystals, 0, fNumCrystals, 2000, -150, 50);
-    TH2F* SlopeProtonVsCrystal = new TH2F("proton_slope_vs_CrystalID", "SlopeProton vs Crystal ID; Crystal ID; Slope", fNumCrystals, 0, fNumCrystals, 1000, 0, 60);
-    TH2F* Chi2ProtonVsCrystal = new TH2F("proton_chi2_vs_CrystalID", "Chi2Proton vs Crystal ID; Crystal ID; Chi2", fNumCrystals, 0, fNumCrystals, 1000, 0, 1);
-    TH2F* PValueProtonVsCrystal = new TH2F("proton_pvalue_vs_CrystalID", "PValueProton vs Crystal ID; Crystal ID; PValue", fNumCrystals, 0, fNumCrystals, 1100, 0, 1.1);
+    TH2F* OffsetGammaVsCrystal = new TH2F("gamma_Offset_vs_CrystalID", "Offset Gamma vs Crystal ID; Crystal ID; Offset", fNumCrystals, 0, fNumCrystals, 1200, -100, 100);
+    TH2F* SlopeGammaVsCrystal = new TH2F("gamma_Slope_vs_CrystalID", "Slope Gamma vs Crystal ID; Crystal ID; Slope", fNumCrystals, 0, fNumCrystals, 400, 0, 4);
+    TH2F* OffsetProtonVsCrystal = new TH2F("proton_Offset_vs_CrystalID", "Offset Proton vs Crystal ID; Crystal ID; Offset", fNumCrystals, 0, fNumCrystals, 2000, -150, 50);
+    TH2F* SlopeProtonVsCrystal = new TH2F("proton_Slope_vs_CrystalID", "Slope Proton vs Crystal ID; Crystal ID; Slope", fNumCrystals, 0, fNumCrystals, 1000, 0, 60);
+    TH2F* Chi2ProtonVsCrystal = new TH2F("proton_Chi2_vs_CrystalID", "#Chi^{2} Proton vs Crystal ID; Crystal ID; #chi^{2}", fNumCrystals, 0, fNumCrystals, 1000, 0, 1);
+    TH2F* PValueProtonVsCrystal = new TH2F("proton_Pvalue_vs_CrystalID", "P-Value Proton vs Crystal ID; Crystal ID; P-Value", fNumCrystals, 0, fNumCrystals, 1100, 0, 1.1);
+    TH2F* Angles_RangeFactorVsThetaPhi = new TH2F("Range_Factor_vs_Theta_Phi", "Range Factor; Theta [deg]; Phi [deg]", 90, 0, 90, 180, -180, 180);
+    TH2F* Febex_RangeFactorVsThetaPhi = new TH2F("Range_Factor_vs_Febex", "Range Factor; SFP; Channel", 92, 0, 92, 40, 0, 40);
     
     vector<TH2F*> gamma_SigmaVsCrystal(Num_all_peaks_gamma);
     vector<TH2F*> proton_SigmaVsCrystal(Num_all_peaks_proton);
     
     for (int j = 0; j < fNumPeaks; ++j) {
-        string histName = "gamma_source_Peak_" + to_string(j + 1) + "_Sigma_vs_CrystalID";
-        string histTitle = "gamma source Peak " + to_string(j + 1) + " Sigma vs Crystal ID; Crystal ID; Sigma";
+        string histName = "gamma_source_peak_" + to_string(j + 1) + "_Sigma_vs_CrystalID";
+        string histTitle = "Gamma Source Peak " + to_string(j + 1) + " Sigma vs Crystal ID; Crystal ID; Sigma";
 
         gamma_SigmaVsCrystal[j] = new TH2F(histName.c_str(), histTitle.c_str(), fNumCrystals, 0, fNumCrystals, 1000, 0, 100);
     }
     
     for (int j = 0; j < fNumVoltages_gamma; ++j) {
-        string histName = "gamma_pulser_Peak_" + to_string(j + 1) + "_Sigma_vs_CrystalID";
-        string histTitle = "gamma pulser Peak " + to_string(j + 1) + " Sigma vs Crystal ID; Crystal ID; Sigma";
+        string histName = "gamma_pulser_peak_" + to_string(j + 1) + "_Sigma_vs_CrystalID";
+        string histTitle = "Gamma Pulser Peak " + to_string(j + 1) + " Sigma vs Crystal ID; Crystal ID; Sigma";
 
         gamma_SigmaVsCrystal[j+fNumPeaks] = new TH2F(histName.c_str(), histTitle.c_str(), fNumCrystals, 0, fNumCrystals, 1000, 0, 100);
     }
     
     for (int j = 0; j < fNumPeaks; ++j) {
-        string histName = "proton_source_Peak_" + to_string(j + 1) + "_Sigma_vs_CrystalID";
-        string histTitle = "proton source Peak " + to_string(j + 1) + " Sigma vs Crystal ID; Crystal ID; Sigma";
+        string histName = "proton_source_peak_" + to_string(j + 1) + "_Sigma_vs_CrystalID";
+        string histTitle = "Proton Source Peak " + to_string(j + 1) + " Sigma vs Crystal ID; Crystal ID; Sigma";
 
         proton_SigmaVsCrystal[j] = new TH2F(histName.c_str(), histTitle.c_str(), fNumCrystals, 0, fNumCrystals, 1000, 0, 30);
     }
     
     for (int j = 0; j < fNumVoltages_proton; ++j) {
-        string histName = "proton_pulser_Peak_" + to_string(j + 1) + "_Sigma_vs_CrystalID";
-        string histTitle = "proton pulser Peak " + to_string(j + 1) + " Sigma vs Crystal ID; Crystal ID; Sigma";
+        string histName = "proton_pulser_peak_" + to_string(j + 1) + "_Sigma_vs_CrystalID";
+        string histTitle = "Proton Pulser Peak " + to_string(j + 1) + " Sigma vs Crystal ID; Crystal ID; Sigma";
 
         proton_SigmaVsCrystal[j+fNumPeaks] = new TH2F(histName.c_str(), histTitle.c_str(), fNumCrystals, 0, fNumCrystals, 1000, 0, 30);
     }
@@ -1015,6 +1044,29 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
         SlopeProtonVsCrystal->Fill(xValues_proton[i], ySlopePulserValues[i]);
         Chi2ProtonVsCrystal->Fill(xValues_proton[i], ychi2[i]);
         PValueProtonVsCrystal->Fill(xValues_proton[i], ypvalue[i]);
+        
+        theta = theta_angles[xValues_proton[i]];
+        phi = phi_angles[xValues_proton[i]];
+        Angles_RangeFactorVsThetaPhi->Fill(theta, phi, yrangefactor[i]);
+        
+        half = half_vals[xValues_proton[i]];
+        ring = ring_vals[xValues_proton[i]];
+        preamp = preamp_vals[xValues_proton[i]];
+        channel = channel_vals[xValues_proton[i]];
+        febex_pc = febex_pc_vals[xValues_proton[i]];
+        febex_sfp = febex_sfp_vals[xValues_proton[i]];
+        febex_mod = febex_mod_vals[xValues_proton[i]];
+        febex_ch = febex_ch_vals[xValues_proton[i]];
+        
+        Int_t Febex_x = 2 + febex_mod + 18*febex_sfp + 72*febex_pc;
+        Int_t Febex_y = 1 + channel + (40-20*half);
+        
+        if (Febex_x < 0 || Febex_x > 90 || Febex_y < 0 || Febex_y > 39) 
+        {
+            cout << "Warnung: Febex_x = " << Febex_x << ", Febex_y = " << Febex_y << channel << half << xValues_proton[i] << endl;
+        }
+        
+        Febex_RangeFactorVsThetaPhi->Fill(Febex_x, Febex_y, yrangefactor[i]);
     }
 
     OffsetGammaVsCrystal->SetMarkerStyle(20); 
@@ -1043,8 +1095,6 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
     Chi2ProtonVsCrystal->SetMarkerSize(0.5);
     PValueProtonVsCrystal->SetMarkerStyle(20);
     PValueProtonVsCrystal->SetMarkerSize(0.5);
-    RangeFactorVsCrystal->SetMarkerStyle(20);
-    RangeFactorVsCrystal->SetMarkerSize(0.5);
     
     OffsetGammaVsCrystal->GetXaxis()->SetRangeUser(Crystalrange_low, fNumCrystals/2);
     SlopeGammaVsCrystal->GetXaxis()->SetRangeUser(Crystalrange_low, fNumCrystals/2);
@@ -1059,8 +1109,7 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
     OffsetProtonVsCrystal->GetXaxis()->SetRangeUser(fNumCrystals/2, Crystalrange_high);
     Chi2ProtonVsCrystal->GetXaxis()->SetRangeUser(fNumCrystals/2, Crystalrange_high);      
     PValueProtonVsCrystal->GetXaxis()->SetRangeUser(fNumCrystals/2, Crystalrange_high);      
-    RangeFactorVsCrystal->GetXaxis()->SetRangeUser(fNumCrystals/2, Crystalrange_high);
-
+    
     PeaksFoundVsCrystal->Write();
 
     for (int j = 0; j < Num_all_peaks_gamma; ++j) 
@@ -1117,11 +1166,23 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
         CalibratedEnergies_differenceVsCrystal[j]->GetXaxis()->SetRangeUser(fNumCrystals/2, Crystalrange_high);
         
         CalibratedEnergies_differenceVsCrystal[j]->Write();
-        
     } 
     
-    RangeFactorVsCrystal->Write();
+    for (int j = 0; j < fNumVoltages_gamma; ++j) 
+    {
+        RangeFactorVsCrystal[j]->SetMarkerStyle(20);
+        RangeFactorVsCrystal[j]->SetMarkerSize(0.5);
+        
+        RangeFactorVsCrystal[j]->GetXaxis()->SetRangeUser(fNumCrystals/2, Crystalrange_high);
+
+        RangeFactorVsCrystal[j]->Write();
+    }
+    
+    Angles_RangeFactorVsThetaPhi->SetOption("COLZ");
+    Febex_RangeFactorVsThetaPhi->SetOption("COLZ");
+    
     Angles_RangeFactorVsThetaPhi->Write();
+    Febex_RangeFactorVsThetaPhi->Write();   
     //_________________________________________//
     
     //set CalParameters
