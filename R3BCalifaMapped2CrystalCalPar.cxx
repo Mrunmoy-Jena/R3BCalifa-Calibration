@@ -461,8 +461,9 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
     TH2F* PeaksCalibratedGammaVsCrystal = new TH2F("gamma_Peaks_Calibrated_vs_Crystal", "Peaks Calibrated Gamma vs Crystal ID; Crystal ID; Energy [MeV]", fNumCrystals, 0, fNumCrystals, 3000, 0, 30);
     TH2F* PeaksCalibratedProtonVsCrystal = new TH2F("proton_Peaks_Calibrated_vs_Crystal", "Peaks Calibrated Proton vs Crystal ID; Crystal ID; Energy [MeV]", fNumCrystals, 0, fNumCrystals, 4000, 0, 400);
     TH2F* PulserPeaksCapacityProtonVsCrystal = new TH2F("proton_Pulser_Peaks_Calibrated/Capacity_vs_Crystal", "Pulser Peaks Calibrated Proton/Capacity vs Crystal ID; Crystal ID; Energy", fNumCrystals/2, fNumCrystals/2, fNumCrystals, 6000, 0, 30);
+    TH2F* RangeFactorMeanVsCrystal = new TH2F("Range_Factor_Mean_pulser_Peak_vs_CrystalID", "Range Factor Mean pulser Peaks Crystal ID; Crystal ID; Range factor", fNumCrystals/2, fNumCrystals/2, fNumCrystals, 1200, 0, 20);
     TH2F* PulserPeaksAllCapacityProtonVsCrystal = new TH2F("proton_All_Pulser_Peaks_Calibrated/Capacity_vs_Crystal", "Pulser Peaks Calibrated Proton/Capacity vs Crystal ID; Crystal ID; Energy", fNumCrystals/2, fNumCrystals/2, fNumCrystals, 4000, 0, 400);
-    TH2F* RangeFactorVsPulserPeaksCapacityProton = new TH2F("Range_Factor_vs_proton_Pulser_Peaks_Calibrated/Capacity", "Range Factor vs Pulser Peaks Calibrated Proton/Capacity; Energy; Range Factor", 4000, 0, 400, 200, 0, 20);
+    TH2F* RangeFactorVsPulserPeaksProton = new TH2F("Range_Factor_vs_proton_Pulser_Peaks", "Range Factor vs Pulser Peaks Proton; Bin number; Range Factor", 10000, 0, 30000, 1000, 8, 18);
     TH2F* CalibratedEnergies_VoltageVsCrystal = new TH2F("proton_E/V_vs_Crystal", "E/V vs Crystal ID; Crystal ID; E/V", fNumCrystals, 0, fNumCrystals, 1800, 0, 180);
     
     vector<TH2F*> CalibratedEnergies_differenceVsCrystal(fNumVoltages_proton-fNumVoltages_gamma);
@@ -479,7 +480,7 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
         string histName = "Range_Factor_pulser_Peak_" + to_string(j + 1) + "_vs_CrystalID";
         string histTitle = "Range Factor pulser Peak " + to_string(j + 1) + " vs Crystal ID; Crystal ID; Range factor";
 
-        RangeFactorVsCrystal[j] = new TH2F(histName.c_str(), histTitle.c_str(), fNumCrystals, 0, fNumCrystals, 1200, 0, 20);
+        RangeFactorVsCrystal[j] = new TH2F(histName.c_str(), histTitle.c_str(), fNumCrystals/2, fNumCrystals/2, fNumCrystals, 1200, 0, 20);
     }
     
     // Arrays to store the x and y values ​​for the graphs
@@ -895,6 +896,8 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
                                 range_factor = range_factor_sum/fNumVoltages_gamma;
                                 yrangefactor.push_back(range_factor);
                                 
+                                RangeFactorMeanVsCrystal->Fill(i + 1, range_factor);
+                                
                                 cout << "Range factor: " << range_factor << endl;
                                 break;
                             }
@@ -974,7 +977,8 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
                             }
                             
                             PulserPeaksAllCapacityProtonVsCrystal->Fill(i + 1, pulser_calibrated_capacity);
-                            RangeFactorVsPulserPeaksCapacityProton->Fill(pulser_calibrated_capacity, range_factor);
+                            
+                            RangeFactorVsPulserPeaksProton->Fill(X_Pulser[e], range_factor);
                             
                             cout << "Pulser Peak " << e + 1 << ", Energy calibrated: " << PulserEnergycalibrated[e] << endl;
                             }
@@ -1109,14 +1113,16 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
     PulserPeaksCapacityProtonVsCrystal->SetMarkerSize(0.5);  
     PulserPeaksAllCapacityProtonVsCrystal->SetMarkerStyle(20);
     PulserPeaksAllCapacityProtonVsCrystal->SetMarkerSize(0.5);  
-    RangeFactorVsPulserPeaksCapacityProton->SetMarkerStyle(20);
-    RangeFactorVsPulserPeaksCapacityProton->SetMarkerSize(0.5);  
+    RangeFactorVsPulserPeaksProton->SetMarkerStyle(20);
+    RangeFactorVsPulserPeaksProton->SetMarkerSize(0.5);  
     OffsetProtonVsCrystal->SetMarkerStyle(20);
     OffsetProtonVsCrystal->SetMarkerSize(0.5);
     SlopeProtonVsCrystal->SetMarkerStyle(20);
     SlopeProtonVsCrystal->SetMarkerSize(0.5); 
     Chi2ProtonVsCrystal->SetMarkerStyle(20);
     Chi2ProtonVsCrystal->SetMarkerSize(0.5);
+    RangeFactorMeanVsCrystal->SetMarkerStyle(20);
+    RangeFactorMeanVsCrystal->SetMarkerSize(0.5);
     PValueProtonVsCrystal->SetMarkerStyle(20);
     PValueProtonVsCrystal->SetMarkerSize(0.5);
     
@@ -1133,6 +1139,7 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
     SlopeProtonVsCrystal->GetXaxis()->SetRangeUser(fNumCrystals/2, Crystalrange_high); 
     OffsetProtonVsCrystal->GetXaxis()->SetRangeUser(fNumCrystals/2, Crystalrange_high);
     Chi2ProtonVsCrystal->GetXaxis()->SetRangeUser(fNumCrystals/2, Crystalrange_high);      
+    RangeFactorMeanVsCrystal->GetXaxis()->SetRangeUser(fNumCrystals/2, Crystalrange_high);      
     PValueProtonVsCrystal->GetXaxis()->SetRangeUser(fNumCrystals/2, Crystalrange_high);      
     
     PeaksFoundVsCrystal->Write();
@@ -1205,6 +1212,8 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
         RangeFactorVsCrystal[j]->Write();
     }
     
+    RangeFactorMeanVsCrystal->Write();
+    
     Double_t min_range_factor = *min_element(yrangefactor.begin(), yrangefactor.end());
     Double_t max_range_factor = *max_element(yrangefactor.begin(), yrangefactor.end());
 
@@ -1216,7 +1225,6 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
     range_factor_angles->cd();
     Angles_RangeFactorVsThetaPhi->Draw("COLZ");
     range_factor_angles->Write(); 
-    delete range_factor_angles;
     
     Febex_RangeFactorVsThetaPhi->SetMinimum(min_range_factor);
     Febex_RangeFactorVsThetaPhi->SetMaximum(max_range_factor);
@@ -1228,7 +1236,7 @@ void R3BCalifaMapped2CrystalCalPar::PulserCalibration()
     range_factor->Write(); 
     delete range_factor;
      
-    RangeFactorVsPulserPeaksCapacityProton->Write();
+    RangeFactorVsPulserPeaksProton->Write();
     
     //_________________________________________//
     
